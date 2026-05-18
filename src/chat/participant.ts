@@ -26,9 +26,9 @@ interface SlashCommand {
 
 const SLASH_COMMANDS: SlashCommand[] = [
   { name: 'summary', description: 'Get a quick summary of your AI coding usage', defaultPrompt: 'Give me a concise overview of my AI coding usage, highlighting strengths and top areas to improve.' },
-  { name: 'improve', description: 'Get improvement recommendations', defaultPrompt: 'Analyse my usage patterns and give me the top 3 things I should improve, with specific actions.' },
+  { name: 'improve', description: 'Get improvement recommendations', defaultPrompt: 'Analyze my usage patterns and give me the top 3 things I should improve, with specific actions.' },
   { name: 'compare', description: 'Compare your AI coding tools', defaultPrompt: 'Compare the AI coding tools I use and tell me which is most effective for what.' },
-  { name: 'flow', description: 'Analyse your flow & focus', defaultPrompt: 'Analyse my flow state and deep work patterns. When am I most productive, and how can I protect that time?' },
+  { name: 'flow', description: 'Analyze your flow & focus', defaultPrompt: 'Analyze my flow state and deep work patterns. When am I most productive, and how can I protect that time?' },
 ];
 
 /* ---- build tools array for sendRequest ---- */
