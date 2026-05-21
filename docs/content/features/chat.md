@@ -10,6 +10,8 @@ The `@aicoach` chat participant gives you conversational access to all AI Engine
 
 ## Getting Started
 
+Before using `@aicoach`, open the AI Engineer Coach sidebar at least once to load your session data.
+
 Type `@aicoach` in any VS Code chat panel followed by your question:
 
 ```
