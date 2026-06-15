@@ -6,6 +6,7 @@
 /* External harness collection registry for parser orchestration. */
 
 import * as fs from 'fs';
+import * as path from 'path';
 import { Workspace, Session } from './types';
 import { findClaudeDirs, parseClaudeSessions, parseClaudeSessionsAsync } from './parser-claude';
 import { findCodexDirs, parseCodexSessions } from './parser-codex';
@@ -32,9 +33,9 @@ function addSession(workspaces: WorkspaceMap, sessions: Session[], session: Sess
   // Try to match with an existing workspace by path
   let matchedWs: Workspace | undefined;
   if (sessionRootPath) {
-    const normPath = sessionRootPath.toLowerCase().replace(/[\\/]$/, '').replace(/\\/g, '/');
+    const normPath = sessionRootPath.toLowerCase().replaceAll(/[\\/]$/, '').replaceAll(/\\/g, '/');
     for (const ws of workspaces.values()) {
-      if (ws.path && ws.path.toLowerCase().replace(/[\\/]$/, '').replace(/\\/g, '/') === normPath) {
+      if (ws.path && ws.path.toLowerCase().replaceAll(/[\\/]$/, '').replaceAll(/\\/g, '/') === normPath) {
         matchedWs = ws;
         break;
       }
@@ -103,7 +104,7 @@ const EXTERNAL_HARNESSES: ExternalHarnessCollector[] = [
       for (const kiroDir of findKiroDirs()) {
         const workspaces = fs.readdirSync(kiroDir, { withFileTypes: true }).filter(d => d.isDirectory());
         for (const ws of workspaces) {
-          const wsPath = require('path').join(kiroDir, ws.name);
+          const wsPath = path.join(kiroDir, ws.name);
           const sessions = parseKiroSessions(wsPath, ws.name);
           for (const session of sessions) addSession(ctx.workspaces, ctx.sessions, session, wsPath);
         }

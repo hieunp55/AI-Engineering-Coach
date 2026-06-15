@@ -355,7 +355,7 @@ async function selectModel(): Promise<vscode.LanguageModelChat> {
       await new Promise(resolve => setTimeout(resolve, 1000));
       any = await vscode.lm.selectChatModels({});
       if (any.length > 0) return any[0];
-    } catch (e) {
+    } catch {
       // Ignore auth failures or missing providers
     }
   }
@@ -388,19 +388,27 @@ async function callGeminiApi(apiKey: string, messages: vscode.LanguageModelChatM
 
   const contents = messages.map(m => ({
     role: m.role === vscode.LanguageModelChatMessageRole.User ? 'user' : 'model',
-    parts: [{ text: typeof m.content === 'string' ? m.content : (m.content[0] as any).value }]
+    parts: [{ text: typeof m.content === 'string' ? m.content : (m.content[0] as { value: string }).value }]
   }));
 
-  const body: any = { contents };
+  interface GeminiRequest {
+    contents: Array<{ role: string; parts: Array<{ text: string }> }>;
+    generationConfig?: {
+      responseMimeType: string;
+      responseSchema: Record<string, unknown>;
+    };
+  }
+
+  const body: GeminiRequest = { contents };
   if (jsonSchema) {
     // Gemini API does not support additionalProperties in the schema
-    const stripAdditionalProperties = (obj: any): any => {
+    const stripAdditionalProperties = (obj: unknown): unknown => {
       if (Array.isArray(obj)) return obj.map(stripAdditionalProperties);
       if (typeof obj === 'object' && obj !== null) {
-        const newObj: any = {};
+        const newObj: Record<string, unknown> = {};
         for (const key in obj) {
           if (key === 'additionalProperties') continue;
-          newObj[key] = stripAdditionalProperties(obj[key]);
+          newObj[key] = stripAdditionalProperties((obj as Record<string, unknown>)[key]);
         }
         return newObj;
       }
@@ -409,7 +417,7 @@ async function callGeminiApi(apiKey: string, messages: vscode.LanguageModelChatM
 
     body.generationConfig = {
       responseMimeType: "application/json",
-      responseSchema: stripAdditionalProperties(jsonSchema.schema)
+      responseSchema: stripAdditionalProperties(jsonSchema.schema) as Record<string, unknown>
     };
   }
 
@@ -424,7 +432,10 @@ async function callGeminiApi(apiKey: string, messages: vscode.LanguageModelChatM
     throw new Error(`Google API Error: ${err}`);
   }
 
-  const data = await res.json() as any;
+  interface GeminiResponse {
+    candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
+  }
+  const data = await res.json() as GeminiResponse;
   if (!data.candidates?.[0]?.content?.parts?.[0]?.text) {
     throw new Error('Unexpected Google API response structure');
   }

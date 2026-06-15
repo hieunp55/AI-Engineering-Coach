@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, Mock } from 'vitest';
 import * as vscode from 'vscode';
 import { callLlm } from './panel-llm';
 
@@ -18,7 +18,7 @@ vi.mock('vscode', () => ({
       get: vi.fn(),
     })),
   },
-  CancellationTokenSource: vi.fn(function (this: any) {
+  CancellationTokenSource: vi.fn(function (this: { token: unknown; cancel: unknown; dispose: unknown }) {
     this.token = {};
     this.cancel = vi.fn();
     this.dispose = vi.fn();
@@ -41,7 +41,7 @@ describe('panel-llm', () => {
 
   it('bypasses vscode.lm and uses REST API when GOOGLE_GEMINI_API_KEY is configured', async () => {
     process.env.GOOGLE_GEMINI_API_KEY = 'env-api-key';
-    (global.fetch as any).mockResolvedValue({
+    (global.fetch as Mock).mockResolvedValue({
       ok: true,
       json: async () => ({
         candidates: [{ content: { parts: [{ text: 'Mock Gemini response' }] } }]
@@ -50,7 +50,7 @@ describe('panel-llm', () => {
 
     const messages = [
       vscode.LanguageModelChatMessage.User('Hello')
-    ] as any;
+    ] as vscode.LanguageModelChatMessage[];
 
     const result = await callLlm(messages);
 
@@ -67,11 +67,11 @@ describe('panel-llm', () => {
 
   it('uses vscode.lm when no Google API key environment variable is configured', async () => {
     const sendRequest = vi.fn().mockResolvedValue({ text: ['Copilot response'] });
-    (vscode.lm.selectChatModels as any).mockResolvedValue([{ sendRequest }]);
+    (vscode.lm.selectChatModels as Mock).mockResolvedValue([{ sendRequest }]);
 
     const messages = [
       vscode.LanguageModelChatMessage.User('Hello')
-    ] as any;
+    ] as vscode.LanguageModelChatMessage[];
 
     const result = await callLlm(messages);
 

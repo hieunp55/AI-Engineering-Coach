@@ -196,7 +196,7 @@ function parseSessionFile(filePath: string, sessionId: string): Session | null {
     });
 
     flushRequest();
-  } catch (e) {
+  } catch {
     // Return null if parsing fails
     return null;
   }

@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { Session, SessionRequest } from './types';
-import { ParseContext, createRequest, createSession } from './parser-shared';
+import { createRequest, createSession } from './parser-shared';
 import { debugCore } from './log';
 
 export function findKiroDirs(): string[] {
@@ -88,15 +88,15 @@ export function parseKiroSessions(workspaceDir: string, base64Path: string): Ses
     if (!fs.existsSync(sessionFilePath)) continue;
 
     const fileTimestamp = parseKiroTimestamp(fs.statSync(sessionFilePath).mtimeMs);
-    let sessionData: any;
+    let sessionData: unknown;
     try {
-      sessionData = JSON.parse(fs.readFileSync(sessionFilePath, 'utf-8'));
+      sessionData = JSON.parse(fs.readFileSync(sessionFilePath, 'utf-8')) as Record<string, unknown>;
     } catch (e) {
       debugCore('parser-kiro', `Failed to parse ${sessionFilePath}`, e);
       continue;
     }
 
-    if (!sessionData || !Array.isArray(sessionData.history)) continue;
+    if (!sessionData || typeof sessionData !== 'object' || !Array.isArray((sessionData as Record<string, unknown>).history)) continue;
 
     const requests: SessionRequest[] = [];
     let currentMessageText = '';
