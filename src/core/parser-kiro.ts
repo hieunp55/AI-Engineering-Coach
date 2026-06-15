@@ -61,6 +61,13 @@ function kiroContentText(content: unknown): string {
   return '';
 }
 
+interface KiroSessionData {
+  history: any[];
+  dateCreated?: string | number;
+  selectedModel?: string;
+  defaultModelTitle?: string;
+}
+
 export function parseKiroSessions(workspaceDir: string, base64Path: string): Session[] {
   const sessionsJsonPath = path.join(workspaceDir, 'sessions.json');
   if (!fs.existsSync(sessionsJsonPath)) {
@@ -98,13 +105,15 @@ export function parseKiroSessions(workspaceDir: string, base64Path: string): Ses
 
     if (!sessionData || typeof sessionData !== 'object' || !Array.isArray((sessionData as Record<string, unknown>).history)) continue;
 
+    const data = sessionData as KiroSessionData;
+
     const requests: SessionRequest[] = [];
     let currentMessageText = '';
     let currentResponseText = '';
     let currentModelId = '';
     let currentTimestamp: number | null = null;
     let currentRequestId = '';
-    const creationTs = parseKiroTimestamp(metadata.dateCreated) ?? parseKiroTimestamp(sessionData.dateCreated) ?? fileTimestamp;
+    const creationTs = parseKiroTimestamp(metadata.dateCreated) ?? parseKiroTimestamp(data.dateCreated) ?? fileTimestamp;
 
     const flushRequest = (): void => {
       if (!currentMessageText || !currentResponseText) return;
@@ -115,7 +124,7 @@ export function parseKiroSessions(workspaceDir: string, base64Path: string): Ses
         timestamp,
         messageText: currentMessageText.trim(),
         responseText: currentResponseText.trim(),
-        modelId: currentModelId || sessionData.selectedModel || sessionData.defaultModelTitle || '',
+        modelId: currentModelId || data.selectedModel || data.defaultModelTitle || '',
       }));
       currentMessageText = '';
       currentResponseText = '';
@@ -124,7 +133,7 @@ export function parseKiroSessions(workspaceDir: string, base64Path: string): Ses
       currentRequestId = '';
     };
     
-    for (const item of sessionData.history) {
+    for (const item of data.history) {
       const message = item.message ?? item.msg;
       if (!message) continue;
       const role = message.role;
