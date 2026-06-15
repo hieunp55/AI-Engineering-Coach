@@ -347,7 +347,7 @@ async function selectModel(): Promise<vscode.LanguageModelChat> {
     { id: 'google', scopes: ['email'] },
     { id: 'microsoft', scopes: ['email'] }
   ];
-  
+
   for (const provider of providers) {
     try {
       await vscode.authentication.getSession(provider.id, provider.scopes, { createIfNone: true });
@@ -385,7 +385,7 @@ function getGoogleApiKey(): string {
 
 async function callGeminiApi(apiKey: string, messages: vscode.LanguageModelChatMessage[], jsonSchema?: JsonSchemaSpec): Promise<string> {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${apiKey}`;
-  
+
   const contents = messages.map(m => ({
     role: m.role === vscode.LanguageModelChatMessageRole.User ? 'user' : 'model',
     parts: [{ text: typeof m.content === 'string' ? m.content : (m.content[0] as any).value }]
@@ -503,7 +503,7 @@ export async function callLlmJson<T>(messages: vscode.LanguageModelChatMessage[]
       if (err instanceof vscode.CancellationError) { cts.dispose(); throw err; }
       // Drop structured output so later attempts can recover in plain mode.
       if (jsonSchema && options.modelOptions && lastError instanceof Error &&
-          /response_format|modelOptions|not supported|JSON|parse/i.test(lastError.message)) {
+        /response_format|modelOptions|not supported|JSON|parse/i.test(lastError.message)) {
         options.modelOptions = undefined;
       }
       // On parse failures, nudge the model to return valid JSON on the next attempt

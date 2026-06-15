@@ -148,13 +148,13 @@ export async function renderConfigHealth(container: HTMLElement, currentFilter: 
   const cutoffTitle = `Sessions before ${TOKEN_DATA_AVAILABLE_FROM} did not capture per-request token data, so this range can't show meaningful context analytics. It will become available again once enough recent data falls within the range.`;
   const rangeButtons = visibleRanges.length > 0
     ? visibleRanges.map(r => {
-        const disabled = isRangeDisabledByCutoff(r.days);
-        const isActive = cur === r.days && !disabled;
-        const cls = `cons-range-btn${isActive ? ' active' : ''}${disabled ? ' disabled' : ''}`;
-        return disabled
-          ? html`<button class=${cls} data-range=${String(r.days)} disabled aria-disabled="true" title=${cutoffTitle} style="opacity:0.4;cursor:not-allowed;">${r.label}</button>`
-          : html`<button class=${cls} data-range=${String(r.days)}>${r.label}</button>`;
-      })
+      const disabled = isRangeDisabledByCutoff(r.days);
+      const isActive = cur === r.days && !disabled;
+      const cls = `cons-range-btn${isActive ? ' active' : ''}${disabled ? ' disabled' : ''}`;
+      return disabled
+        ? html`<button class=${cls} data-range=${String(r.days)} disabled aria-disabled="true" title=${cutoffTitle} style="opacity:0.4;cursor:not-allowed;">${r.label}</button>`
+        : html`<button class=${cls} data-range=${String(r.days)}>${r.label}</button>`;
+    })
     : html`<span style="color:var(--text-muted);font-size:12px;padding:4px 8px;line-height:1.4;">${emptyRangeMessage}</span>`;
 
   render(html`
@@ -301,11 +301,11 @@ function renderAgenticReadiness(ar: AgenticReadinessScore): ComponentChildren {
     <p style="color:var(--text-muted);font-size:12px;margin:4px 0 8px;">${present}/${total} signals detected. Are your projects ready for AI agents?</p>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin:8px 0 16px;">
       ${ar.signals.map(s => {
-        const ic = s.present ? COLORS.green : COLORS.red;
-        const icon = s.present ? '\u2713' : '\u2717';
-        const bg = s.present ? 'rgba(63,185,80,0.08)' : 'rgba(248,81,73,0.06)';
-        const border = s.present ? 'rgba(63,185,80,0.3)' : 'rgba(248,81,73,0.2)';
-        return html`<div style="padding:10px 12px;border-radius:8px;background:${bg};border:1px solid ${border};" title=${s.detail}>
+    const ic = s.present ? COLORS.green : COLORS.red;
+    const icon = s.present ? '\u2713' : '\u2717';
+    const bg = s.present ? 'rgba(63,185,80,0.08)' : 'rgba(248,81,73,0.06)';
+    const border = s.present ? 'rgba(63,185,80,0.3)' : 'rgba(248,81,73,0.2)';
+    return html`<div style="padding:10px 12px;border-radius:8px;background:${bg};border:1px solid ${border};" title=${s.detail}>
           <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
             <span style="color:${ic};font-size:14px;">${icon}</span>
             <span style="font-weight:600;font-size:13px;">${s.label}</span>
@@ -313,7 +313,7 @@ function renderAgenticReadiness(ar: AgenticReadinessScore): ComponentChildren {
           </div>
           <div style="font-size:11px;color:var(--text-muted);line-height:1.3;">${s.detail}</div>
         </div>`;
-      })}
+  })}
     </div>`;
 }
 
@@ -430,10 +430,10 @@ function renderReviewCard(review: ContextReviewResult): ComponentChildren {
         </div>
         <div style="display:flex;gap:4px;flex-shrink:0;">
           ${cats.map(([cat, score]) => {
-            const c = score >= 45 ? COLORS.green : score >= 25 ? COLORS.yellow : COLORS.red;
-            const tip = CATEGORY_TOOLTIPS[cat] || '';
-            return html`<div style="text-align:center;min-width:42px;" data-tip=${tip || undefined} tabindex=${tip ? 0 : undefined} aria-label=${tip || undefined}><div style="font-size:12px;font-weight:700;color:${c};">${score}</div><div style="font-size:8px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.3px;">${(CATEGORY_LABELS[cat] || cat).slice(0, 5)}</div></div>`;
-          })}
+    const c = score >= 45 ? COLORS.green : score >= 25 ? COLORS.yellow : COLORS.red;
+    const tip = CATEGORY_TOOLTIPS[cat] || '';
+    return html`<div style="text-align:center;min-width:42px;" data-tip=${tip || undefined} tabindex=${tip ? 0 : undefined} aria-label=${tip || undefined}><div style="font-size:12px;font-weight:700;color:${c};">${score}</div><div style="font-size:8px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.3px;">${(CATEGORY_LABELS[cat] || cat).slice(0, 5)}</div></div>`;
+  })}
         </div>
       </div>
       <div style="display:block;padding:0 16px 16px;border-top:1px solid var(--border-color, #30363d);">
@@ -456,7 +456,7 @@ function renderCategoryBars(cats: [string, number][]): ComponentChildren {
 function renderFinding(f: ContextReviewFinding): ComponentChildren {
   const sevIcon = f.severity === 'good' ? html`<span style="color:${COLORS.green};">${'\u2713'}</span>`
     : f.severity === 'critical' ? html`<span style="color:${COLORS.red};">${'\u2717'}</span>`
-    : html`<span style="color:${COLORS.yellow};">${'\u26A0'}</span>`;
+      : html`<span style="color:${COLORS.yellow};">${'\u26A0'}</span>`;
   const catLabel = CATEGORY_LABELS[f.category] || f.category;
   const bg = f.severity === 'good' ? 'rgba(63,185,80,0.05)' : f.severity === 'critical' ? 'rgba(248,81,73,0.06)' : 'rgba(210,153,34,0.06)';
   return html`
@@ -525,20 +525,22 @@ function renderTreemap(workspaces: WorkspaceConfigHealth[], container: HTMLEleme
       datasets: [{
         tree: treeData,
         key: 'requests',
-        labels: { display: true, formatter: (ctx: { raw: { w: number; h: number; _data: { name: string; score: number; requests: number } } }) => {
-          const d = ctx.raw._data;
-          if (!d) return '';
-          const w = ctx.raw.w || 0;
-          const h = ctx.raw.h || 0;
-          // Small tiles: name only, no stats
-          if (w < 80 || h < 35) return d.name.length > 10 ? d.name.slice(0, 9) + '\u2026' : d.name;
-          return [d.name, `${d.score}pts`];
-        }, color: '#fff', font: (ctx: { raw: { w: number; h: number } }) => {
-          const w = ctx.raw?.w || 0;
-          const h = ctx.raw?.h || 0;
-          if (w < 80 || h < 35) return { size: 9, weight: 'bold' as const };
-          return { size: 11, weight: 'bold' as const };
-        }, padding: 4 },
+        labels: {
+          display: true, formatter: (ctx: { raw: { w: number; h: number; _data: { name: string; score: number; requests: number } } }) => {
+            const d = ctx.raw._data;
+            if (!d) return '';
+            const w = ctx.raw.w || 0;
+            const h = ctx.raw.h || 0;
+            // Small tiles: name only, no stats
+            if (w < 80 || h < 35) return d.name.length > 10 ? d.name.slice(0, 9) + '\u2026' : d.name;
+            return [d.name, `${d.score}pts`];
+          }, color: '#fff', font: (ctx: { raw: { w: number; h: number } }) => {
+            const w = ctx.raw?.w || 0;
+            const h = ctx.raw?.h || 0;
+            if (w < 80 || h < 35) return { size: 9, weight: 'bold' as const };
+            return { size: 11, weight: 'bold' as const };
+          }, padding: 4
+        },
         backgroundColor: (ctx: { raw: { _data: { qualityScore: number } }; active?: boolean }) => {
           const d = ctx.raw?._data;
           return d ? scoreColor(d.qualityScore, ctx.active ? 0.9 : 0.72) : '#888';
@@ -679,10 +681,10 @@ function renderContextProvision(byHarness: Record<string, ContextProvisionScore>
           <th style="padding:8px;">Avg Context</th><th style="padding:8px;">Score</th>
         </tr></thead>
         <tbody>${currentProvisionRows.map((row, idx) => {
-          const e = row.entry;
-          const sc = e.score >= 45 ? COLORS.green : e.score >= 25 ? COLORS.yellow : COLORS.red;
-          const pFmt = (n: number) => e.totalRequests > 0 ? `${n} (${Math.round(n / e.totalRequests * 100)}%)` : '0';
-          return html`
+    const e = row.entry;
+    const sc = e.score >= 45 ? COLORS.green : e.score >= 25 ? COLORS.yellow : COLORS.red;
+    const pFmt = (n: number) => e.totalRequests > 0 ? `${n} (${Math.round(n / e.totalRequests * 100)}%)` : '0';
+    return html`
             <tr class="ctx-provision-row" data-provision-idx=${String(idx)} data-active="false" style="border-bottom:1px solid var(--border-color, #30363d);cursor:pointer;transition:background 0.15s;" title="Click for breakdown">
               <td style="padding:8px;font-weight:500;color:${hc(e.harness)};">${e.harness}</td>
               <td style="padding:8px;">${e.totalRequests.toLocaleString()}</td>
@@ -693,7 +695,7 @@ function renderContextProvision(byHarness: Record<string, ContextProvisionScore>
               <td style="padding:8px;">${e.avgContextItems.toFixed(1)}</td>
               <td style="padding:8px;font-weight:600;color:${sc};">${Math.round(e.score)}/100</td>
             </tr>`;
-        })}</tbody>
+  })}</tbody>
       </table>
     </div>
     <div id="ctxProvisionDetailPanel" style="display:none;margin-top:12px;"></div>`;
@@ -754,8 +756,8 @@ function rankList(title: string, items: { label: string; count: number }[], tota
   return html`<div style="padding:8px 10px;border-radius:6px;background:var(--bg-tertiary, #161b22);">
     <div style="font-size:11px;font-weight:500;color:var(--text-muted);margin-bottom:6px;">${title}</div>
     ${items.map(it => {
-      const pct = total > 0 ? Math.round(it.count / total * 100) : 0;
-      return html`<div class="tip-left" style="display:flex;align-items:center;gap:6px;margin-bottom:4px;" data-tip=${it.label} tabindex=${0} aria-label=${it.label}>
+    const pct = total > 0 ? Math.round(it.count / total * 100) : 0;
+    return html`<div class="tip-left" style="display:flex;align-items:center;gap:6px;margin-bottom:4px;" data-tip=${it.label} tabindex=${0} aria-label=${it.label}>
         <div style="flex:1;min-width:0;">
           <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:1px;min-width:0;">
             <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;">${it.label}</span>
@@ -766,7 +768,7 @@ function rankList(title: string, items: { label: string; count: number }[], tota
           </div>
         </div>
       </div>`;
-    })}
+  })}
   </div>`;
 }
 

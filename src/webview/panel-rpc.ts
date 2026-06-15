@@ -26,7 +26,7 @@ import { parseRule, serializeRule } from '../core/rule-parser';
 import { getRuleLayerInfo, getPersonalRulesDir, getProjectRulesDir } from '../core/rule-loader';
 import { getPending, approve as approveTrust, getDefaultTrustStore } from '../core/rule-trust';
 import { isoWeek } from '../core/helpers';
-import { FIELD_SCHEMA, METRIC_PRIMITIVES, FUNCTION_CATALOG, compileFilter, validateExpression  } from '../core/dsl/index';
+import { FIELD_SCHEMA, METRIC_PRIMITIVES, FUNCTION_CATALOG, compileFilter, validateExpression } from '../core/dsl/index';
 import {
   getAllMetrics,
   parseRuleExtensions,
@@ -816,11 +816,13 @@ const rpcHandlers: TypedRpcHandlers = {
       }
     }
 
-    return { rules, previews, layers, dateHistograms, pending: getPending().map(p => ({
-      filePath: p.filePath,
-      layer: p.layer,
-      kind: p.kind,
-    })) };
+    return {
+      rules, previews, layers, dateHistograms, pending: getPending().map(p => ({
+        filePath: p.filePath,
+        layer: p.layer,
+        kind: p.kind,
+      }))
+    };
   },
 
   getRulePreview: (a, _p, params) => {
@@ -1089,11 +1091,13 @@ Explain why this session triggered the rule.`;
   },
 
   getMetricList: () => {
-    return { metrics: getAllMetrics().map(m => ({
-      id: m.id, name: m.name, scope: m.scope, tags: m.tags,
-      filterExpr: m.filterExpr, aggregationExpr: m.aggregationExpr,
-      source: m.source,
-    })) };
+    return {
+      metrics: getAllMetrics().map(m => ({
+        id: m.id, name: m.name, scope: m.scope, tags: m.tags,
+        filterExpr: m.filterExpr, aggregationExpr: m.aggregationExpr,
+        source: m.source,
+      }))
+    };
   },
 
   evaluateExpression: (a, _p, params) => {

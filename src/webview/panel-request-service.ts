@@ -131,7 +131,7 @@ export class PanelRequestService {
     private readonly webview: vscode.Webview,
     private readonly getAnalyzer: () => Analyzer | undefined,
     private readonly getParseResult: () => ParseResult | undefined,
-  ) {}
+  ) { }
 
   tryHandle(msg: RequestMessage): boolean {
     if (!Object.prototype.hasOwnProperty.call(this.handlers, msg.method)) return false;
@@ -433,16 +433,18 @@ Difficulty: ${difficulty}
 Generate 3 code comparison rounds for this developer's ecosystem. Mix the categories.`;
 
     try {
-      const response = await callLlmJson<{ items: Array<{
-        snippetA: string;
-        snippetB: string;
-        betterSnippet: string;
-        title: string;
-        category: string;
-        explanation: string;
-        difficulty: string;
-        language: string;
-      }> }>([
+      const response = await callLlmJson<{
+        items: Array<{
+          snippetA: string;
+          snippetB: string;
+          betterSnippet: string;
+          title: string;
+          category: string;
+          explanation: string;
+          difficulty: string;
+          language: string;
+        }>
+      }>([
         vscode.LanguageModelChatMessage.User(systemPrompt),
         vscode.LanguageModelChatMessage.User(userPrompt),
       ], SCHEMA_CODE_REVIEW);

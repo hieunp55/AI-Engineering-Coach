@@ -28,7 +28,7 @@ interface ExternalHarnessCollector {
 
 function addSession(workspaces: WorkspaceMap, sessions: Session[], session: Session, rootPath: string): void {
   const sessionRootPath = session.workspaceRootPath && fs.existsSync(session.workspaceRootPath) ? session.workspaceRootPath : rootPath;
-  
+
   // Try to match with an existing workspace by path
   let matchedWs: Workspace | undefined;
   if (sessionRootPath) {
