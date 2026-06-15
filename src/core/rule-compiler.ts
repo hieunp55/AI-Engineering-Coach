@@ -82,7 +82,8 @@ async function compileLlm(
   const lm = vscode.lm;
   if (!lm) return null;
 
-  let model: any;
+  type LanguageModelChat = Awaited<ReturnType<typeof import('vscode').lm.selectChatModels>>[0];
+  let model: LanguageModelChat | null = null;
   const families = ['gpt-4.1', 'gpt-5-mini', 'gpt-4.1-mini', 'codex', 'antigravity'];
   for (const family of families) {
     const models = await lm.selectChatModels({ family });

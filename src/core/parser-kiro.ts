@@ -61,11 +61,33 @@ function kiroContentText(content: unknown): string {
   return '';
 }
 
+interface KiroHistoryItem {
+  message?: { role?: string; content?: unknown; id?: string; timestamp?: unknown; createdAt?: unknown };
+  msg?: { role?: string; content?: unknown; id?: string; timestamp?: unknown; createdAt?: unknown };
+  timestamp?: unknown;
+  createdAt?: unknown;
+  promptLogs?: Array<{ completionOptions?: { model?: string }; modelTitle?: string }>;
+}
+
 interface KiroSessionData {
-  history: any[];
+  history: KiroHistoryItem[];
   dateCreated?: string | number;
   selectedModel?: string;
   defaultModelTitle?: string;
+}
+
+function extractMessageModel(item: KiroHistoryItem): string {
+  if (!item.promptLogs || item.promptLogs.length === 0) return '';
+  const pLog = item.promptLogs[0];
+  return pLog.completionOptions?.model || pLog.modelTitle || '';
+}
+
+function extractItemTimestamp(item: KiroHistoryItem, message: Record<string, unknown>): number | null {
+  return parseKiroTimestamp(item.timestamp)
+    ?? parseKiroTimestamp(item.createdAt)
+    ?? parseKiroTimestamp((message as Record<string, unknown>).timestamp)
+    ?? parseKiroTimestamp((message as Record<string, unknown>).createdAt)
+    ?? null;
 }
 
 export function parseKiroSessions(workspaceDir: string, base64Path: string): Session[] {
@@ -136,24 +158,18 @@ export function parseKiroSessions(workspaceDir: string, base64Path: string): Ses
     for (const item of data.history) {
       const message = item.message ?? item.msg;
       if (!message) continue;
-      const role = message.role;
-      const text = kiroContentText(message.content);
-
-      let itemModel = '';
-      if (item.promptLogs && item.promptLogs.length > 0) {
-        const pLog = item.promptLogs[0];
-        itemModel = pLog.completionOptions?.model || pLog.modelTitle || '';
-      }
+      const role = (message as Record<string, unknown>).role as string | undefined;
+      if (!role) continue;
+      
+      const text = kiroContentText((message as Record<string, unknown>).content);
+      const itemModel = extractMessageModel(item);
 
       if (role === 'user') {
         flushRequest();
         currentMessageText += text + '\n';
-        currentTimestamp = parseKiroTimestamp(item.timestamp)
-          ?? parseKiroTimestamp(item.createdAt)
-          ?? parseKiroTimestamp(message.timestamp)
-          ?? parseKiroTimestamp(message.createdAt)
-          ?? null;
-        if (typeof message.id === 'string') currentRequestId = message.id;
+        currentTimestamp = extractItemTimestamp(item, message as Record<string, unknown>);
+        const msgId = (message as Record<string, unknown>).id;
+        if (typeof msgId === 'string') currentRequestId = msgId;
         if (itemModel) currentModelId = itemModel;
       } else if (role === 'assistant') {
         currentResponseText += text + '\n';
