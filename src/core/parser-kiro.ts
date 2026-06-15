@@ -137,8 +137,8 @@ export function parseKiroSessions(workspaceDir: string, base64Path: string): Ses
     let currentCompletionTokens = 0;
     let currentTimestamp: number | null = null;
     let currentRequestId = '';
-    const creationTs = parseKiroTimestamp(metadata.dateCreated) ?? parseKiroTimestamp(data.dateCreated) ?? fileTimestamp;
-
+    const creationTsFallback = metadata.dateCreated ? parseKiroTimestamp(metadata.dateCreated) : (data.dateCreated ? parseKiroTimestamp(data.dateCreated) : fileTimestamp);
+    const creationTs = creationTsFallback ?? Date.now();
     const flushRequest = (): void => {
       if (!currentMessageText || !currentResponseText) return;
       const requestIndex = requests.length;
@@ -173,8 +173,16 @@ export function parseKiroSessions(workspaceDir: string, base64Path: string): Ses
       if (role === 'user') {
         flushRequest();
         currentMessageText += text + '\n';
-        currentPromptTokens += Math.ceil(text.length / 4);
         currentTimestamp = extractItemTimestamp(item, message);
+        
+        if (item.promptLogs && item.promptLogs.length > 0) {
+          const pLog = item.promptLogs[0];
+          if (pLog.prompt) currentPromptTokens = Math.ceil(pLog.prompt.length / 4);
+        }
+        if (currentPromptTokens === 0) {
+          currentPromptTokens += Math.ceil(text.length / 4);
+        }
+        
         const msgId = (message as Record<string, unknown>).id;
         if (typeof msgId === 'string') currentRequestId = msgId;
         if (itemModel) currentModelId = itemModel;
@@ -182,7 +190,7 @@ export function parseKiroSessions(workspaceDir: string, base64Path: string): Ses
         currentResponseText += text + '\n';
         if (item.promptLogs && item.promptLogs.length > 0) {
           const pLog = item.promptLogs[0];
-          if (pLog.prompt) currentPromptTokens = Math.ceil(pLog.prompt.length / 4);
+          if (pLog.prompt && currentPromptTokens === 0) currentPromptTokens = Math.ceil(pLog.prompt.length / 4);
           if (pLog.completion) {
             currentCompletionTokens = Math.ceil(pLog.completion.length / 4);
             currentResponseText += '\n\n' + pLog.completion;
