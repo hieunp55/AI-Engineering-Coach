@@ -98,7 +98,7 @@ export function parseKiroSessions(workspaceDir: string, base64Path: string): Ses
 
   let metadataArray: KiroSessionMetadata[];
   try {
-    metadataArray = JSON.parse(fs.readFileSync(sessionsJsonPath, 'utf-8'));
+    metadataArray = JSON.parse(fs.readFileSync(sessionsJsonPath, 'utf-8')) as KiroSessionMetadata[];
   } catch (e) {
     debugCore('parser-kiro', `Failed to parse ${sessionsJsonPath}`, e);
     return [];
