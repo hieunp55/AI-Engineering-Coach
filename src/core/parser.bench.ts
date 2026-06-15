@@ -165,7 +165,7 @@ describe('DSL Evaluation', () => {
 
 describe('Rule Pipeline', () => {
   const sessions = Array.from({ length: 10 }, (_, i) => makeSession(i, 5));
-  const reqs = sessions.flatMap(s => s.requests) as unknown as SessionRequest[];
+  const reqs = sessions.flatMap(s => s.requests);
 
   const simpleRule = makeRule('messageLength > 10', 'count > 3');
   const complexRule = makeRule(
@@ -186,7 +186,7 @@ describe('Rule Pipeline', () => {
   });
 
   const largeSessions = Array.from({ length: 50 }, (_, i) => makeSession(i, 10));
-  const largeReqs = largeSessions.flatMap(s => s.requests) as unknown as SessionRequest[];
+  const largeReqs = largeSessions.flatMap(s => s.requests);
 
   bench('pipeline with 500 requests', () => {
     const pipeline = parsePipeline(complexRule);

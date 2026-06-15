@@ -27,7 +27,7 @@ function parseAntigravityLine(rawLine: string): AntigravityLine | null {
   try {
     const parsed = JSON.parse(rawLine) as unknown;
     if (typeof parsed === 'object' && parsed !== null) {
-      return parsed as AntigravityLine;
+      return parsed;
     }
     return null;
   } catch {
@@ -131,14 +131,20 @@ function parseSessionFile(filePath: string, sessionId: string): Session | null {
   let currentToolsUsed: string[] = [];
   let currentEditedFiles: string[] = [];
   let currentReferencedFiles: string[] = [];
+  let currentContextChars = 0;
 
   function flushRequest() {
     if (currentUserMessage || currentResponseTexts.length > 0) {
+      const respText = currentResponseTexts.join('\n\n');
+      currentContextChars += currentUserMessage.length;
+      
       requests.push(createRequest({
         requestId: `antigravity-${requests.length}`,
         timestamp: currentStartTs,
         messageText: currentUserMessage,
-        responseText: currentResponseTexts.join('\n\n'),
+        responseText: respText,
+        promptTokens: currentStartTs ? Math.ceil(currentContextChars / 4) : null,
+        completionTokens: currentStartTs ? Math.ceil(respText.length / 4) : null,
         agentName: 'Antigravity IDE',
         agentMode: 'agent',
         modelId: 'gemini',
@@ -186,6 +192,18 @@ function parseSessionFile(filePath: string, sessionId: string): Session | null {
             if (filePath) {
               if (WRITE_TOOLS.has(toolLower)) {
                 currentEditedFiles.push(filePath);
+                if (toolLower === 'write_to_file' && typeof tc.args?.CodeContent === 'string') {
+                  currentResponseTexts.push(`\`\`\`\n${tc.args.CodeContent}\n\`\`\``);
+                } else if (toolLower === 'replace_file_content' && typeof tc.args?.ReplacementContent === 'string') {
+                  currentResponseTexts.push(`\`\`\`\n${tc.args.ReplacementContent}\n\`\`\``);
+                } else if (toolLower === 'multi_replace_file_content' && Array.isArray(tc.args?.ReplacementChunks)) {
+                  for (const chunk of tc.args.ReplacementChunks) {
+                    const c = chunk as Record<string, unknown>;
+                    if (c && typeof c.ReplacementContent === 'string') {
+                      currentResponseTexts.push(`\`\`\`\n${c.ReplacementContent}\n\`\`\``);
+                    }
+                  }
+                }
               } else if (READ_TOOLS.has(toolLower)) {
                 currentReferencedFiles.push(filePath);
               }

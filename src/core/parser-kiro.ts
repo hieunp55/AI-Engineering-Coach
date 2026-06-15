@@ -66,7 +66,7 @@ interface KiroHistoryItem {
   msg?: { role?: string; content?: unknown; id?: string; timestamp?: unknown; createdAt?: unknown };
   timestamp?: unknown;
   createdAt?: unknown;
-  promptLogs?: Array<{ completionOptions?: { model?: string }; modelTitle?: string }>;
+  promptLogs?: Array<{ completionOptions?: { model?: string }; modelTitle?: string; prompt?: string; completion?: string }>;
 }
 
 interface KiroSessionData {
@@ -85,8 +85,8 @@ function extractMessageModel(item: KiroHistoryItem): string {
 function extractItemTimestamp(item: KiroHistoryItem, message: Record<string, unknown>): number | null {
   return parseKiroTimestamp(item.timestamp)
     ?? parseKiroTimestamp(item.createdAt)
-    ?? parseKiroTimestamp((message as Record<string, unknown>).timestamp)
-    ?? parseKiroTimestamp((message as Record<string, unknown>).createdAt)
+    ?? parseKiroTimestamp((message).timestamp)
+    ?? parseKiroTimestamp((message).createdAt)
     ?? null;
 }
 
@@ -110,7 +110,7 @@ export function parseKiroSessions(workspaceDir: string, base64Path: string): Ses
 
   for (const metadata of metadataArray) {
     if (!wsName && metadata.workspaceDirectory) {
-      wsName = path.basename(metadata.workspaceDirectory);
+      wsName = path.win32.basename(metadata.workspaceDirectory);
     }
 
     const sessionFilePath = path.join(workspaceDir, `${metadata.sessionId}.json`);
@@ -133,6 +133,8 @@ export function parseKiroSessions(workspaceDir: string, base64Path: string): Ses
     let currentMessageText = '';
     let currentResponseText = '';
     let currentModelId = '';
+    let currentPromptTokens = 0;
+    let currentCompletionTokens = 0;
     let currentTimestamp: number | null = null;
     let currentRequestId = '';
     const creationTs = parseKiroTimestamp(metadata.dateCreated) ?? parseKiroTimestamp(data.dateCreated) ?? fileTimestamp;
@@ -147,10 +149,14 @@ export function parseKiroSessions(workspaceDir: string, base64Path: string): Ses
         messageText: currentMessageText.trim(),
         responseText: currentResponseText.trim(),
         modelId: currentModelId || data.selectedModel || data.defaultModelTitle || '',
+        promptTokens: currentPromptTokens > 0 ? currentPromptTokens : null,
+        completionTokens: currentCompletionTokens > 0 ? currentCompletionTokens : null,
       }));
       currentMessageText = '';
       currentResponseText = '';
       currentModelId = '';
+      currentPromptTokens = 0;
+      currentCompletionTokens = 0;
       currentTimestamp = null;
       currentRequestId = '';
     };
@@ -167,12 +173,24 @@ export function parseKiroSessions(workspaceDir: string, base64Path: string): Ses
       if (role === 'user') {
         flushRequest();
         currentMessageText += text + '\n';
-        currentTimestamp = extractItemTimestamp(item, message as Record<string, unknown>);
+        currentPromptTokens += Math.ceil(text.length / 4);
+        currentTimestamp = extractItemTimestamp(item, message);
         const msgId = (message as Record<string, unknown>).id;
         if (typeof msgId === 'string') currentRequestId = msgId;
         if (itemModel) currentModelId = itemModel;
       } else if (role === 'assistant') {
         currentResponseText += text + '\n';
+        if (item.promptLogs && item.promptLogs.length > 0) {
+          const pLog = item.promptLogs[0];
+          if (pLog.prompt) currentPromptTokens = Math.ceil(pLog.prompt.length / 4);
+          if (pLog.completion) {
+            currentCompletionTokens = Math.ceil(pLog.completion.length / 4);
+            currentResponseText += '\n\n' + pLog.completion;
+          }
+        }
+        if (currentCompletionTokens === 0) {
+          currentCompletionTokens = Math.ceil(text.length / 4);
+        }
         if (itemModel) currentModelId = itemModel;
       }
     }

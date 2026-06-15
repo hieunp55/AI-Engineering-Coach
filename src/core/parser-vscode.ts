@@ -822,9 +822,9 @@ function extractRequestVariables(req: RawRequest, resp: RawRequest['response'], 
 }
 
 function extractResultMetadata(result: RawRequest['result']): ParsedResultMetadata {
-  const resultObj = (typeof result === 'object' && result ? result : null) as Record<string, unknown> | null;
+  const resultObj = (typeof result === 'object' && result ? result : null);
   const resultMeta = resultObj?.metadata;
-  const meta = (typeof resultMeta === 'object' && resultMeta ? resultMeta : {}) as Record<string, unknown>;
+  const meta = (typeof resultMeta === 'object' && resultMeta ? resultMeta : {});
   return {
     resultObj,
     meta,
@@ -968,7 +968,7 @@ export function parseSessionFile(sessionFile: string, wsId: string, wsName: stri
     if (sessionFile.endsWith('.jsonl')) {
       const result = reconstructFromJsonl(sessionFile);
       if (!result) return null;
-      data = result as SessionFileData;
+      data = result;
     } else {
       data = JSON.parse(stripImageData(readFile(sessionFile))) as SessionFileData;
     }

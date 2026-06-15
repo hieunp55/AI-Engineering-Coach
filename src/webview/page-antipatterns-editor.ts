@@ -294,7 +294,7 @@ export function wireRuleEditorModal(
         ok: boolean; triggered: boolean; occurrences: number; total: number;
         pct: string; severity: string; description: string; suggestion: string;
         examples: string[]; error?: string;
-      }>('testRuleLive', { markdown, filter: currentFilter as Record<string, unknown> });
+      }>('testRuleLive', { markdown, filter: currentFilter });
 
       const thresholds = parseThresholdsFromMarkdown(markdown);
       const slidersVNode = buildThresholdSliders(thresholds, overrides || {});

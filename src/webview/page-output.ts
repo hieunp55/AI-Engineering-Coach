@@ -507,7 +507,7 @@ export async function renderOutput(container: HTMLElement, currentFilter: DateFi
       const wsYLabel = level === 'daily' ? 'Tokens/day' : level === 'weekly' ? 'Tokens/week' : 'Tokens/month';
       createChart('creditTokenByWsChart', 'bar', {
         labels: wsLabels,
-        datasets: wsDatasets as { label: string; data: number[]; backgroundColor: string; borderColor: string; borderWidth: number; stack: string }[],
+        datasets: wsDatasets,
       }, { plugins: { legend: { position: 'top' }, tooltip: { callbacks: { label: (ctx: { dataset: { label: string }; raw: number }) => `${ctx.dataset.label}: ${formatNum(ctx.raw)} tokens` } } }, scales: { x: { stacked: true, ticks: { maxTicksLimit: 15 } }, y: { stacked: true, beginAtZero: true, title: { display: true, text: wsYLabel }, ticks: { callback: (v: number) => formatNum(v) } } } });
     }
 

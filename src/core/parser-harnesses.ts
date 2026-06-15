@@ -33,9 +33,9 @@ function addSession(workspaces: WorkspaceMap, sessions: Session[], session: Sess
   // Try to match with an existing workspace by path
   let matchedWs: Workspace | undefined;
   if (sessionRootPath) {
-    const normPath = sessionRootPath.toLowerCase().replace(/[\\/]$/, '').replace(/\\/g, '/');
+    const normPath = sessionRootPath.toLowerCase().replace(/[\\/]$/, '').replaceAll('\\', '/');
     for (const ws of workspaces.values()) {
-      if (ws.path && ws.path.toLowerCase().replace(/[\\/]$/, '').replace(/\\/g, '/') === normPath) {
+      if (ws.path && ws.path.toLowerCase().replace(/[\\/]$/, '').replaceAll('\\', '/') === normPath) {
         matchedWs = ws;
         break;
       }

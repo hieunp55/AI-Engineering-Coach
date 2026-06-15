@@ -36,9 +36,9 @@ import {
 } from '../core/metric-engine';
 import { compileNaturalLanguageRule } from '../core/rule-compiler';
 import type { SessionRequest, Session } from '../core/types';
+import { FF_TOKEN_REPORTING_ENABLED } from '../core/constants';
 import { errorResult, isString, isNumber, isOptionalString, isRecord } from './panel-shared';
 import { DSL_CHEATSHEET } from './dsl-cheatsheet';
-import { FF_TOKEN_REPORTING_ENABLED } from '../core/constants';
 
 /**
  * Pick `reqs` or `sessions` based on scope and return them typed as

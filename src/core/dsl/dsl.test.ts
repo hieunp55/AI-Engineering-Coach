@@ -212,7 +212,7 @@ describe('DSL Interpreter', () => {
 
   it('evaluates abs() function', () => {
     const ast = parse(lex('abs(-5)'));
-    expect(evaluate(ast, {} as Record<string, unknown>)).toBe(5);
+    expect(evaluate(ast, {})).toBe(5);
   });
 
   it('evaluates truncate() function', () => {
@@ -246,7 +246,7 @@ describe('DSL Interpreter', () => {
 
   it('evaluates flatUnique() returns 0 when empty', () => {
     const ast = parse(lex('flatUnique(reqs, "toolsUsed")'));
-    expect(evaluate(ast, { reqs: [] } as unknown as Record<string, unknown>)).toBe(0);
+    expect(evaluate(ast, { reqs: [] })).toBe(0);
   });
 });
 

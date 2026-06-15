@@ -176,7 +176,7 @@ function resolveUserPrompt(request: vscode.ChatRequest): string {
 /* ---- follow-ups ---- */
 
 function getFollowups(result: vscode.ChatResult): vscode.ChatFollowup[] {
-  const meta = result.metadata as Record<string, unknown> | undefined;
+  const meta = result.metadata;
   if (meta?.['suppressFollowups']) return [];
 
   return [

@@ -29,6 +29,15 @@ export class ProductionAnalyzer extends AnalyzerBase {
       const workspaceName = session?.workspaceName || '';
       const model = normalizeModel(request.modelId || 'unknown');
       const harness = session?.harness || 'unknown';
+
+      // Ensure groups exist even if no code is produced
+      if (!dailyModelAi.has(model)) dailyModelAi.set(model, new Map());
+      if (!dailyHarnessAi.has(harness)) dailyHarnessAi.set(harness, new Map());
+      if (workspaceName) {
+        if (!wsAi.has(workspaceName)) wsAi.set(workspaceName, 0);
+        if (!dailyWsAi.has(workspaceName)) dailyWsAi.set(workspaceName, new Map());
+      }
+
       for (const block of request.aiCode) {
         totalAiLoc += block.loc;
         aiBlocks++;

@@ -87,8 +87,8 @@ export async function renderSdlc(container: HTMLElement, filter: DateFilter): Pr
 
   // Parallel data fetching
   const [sessions, toolAnalysis, repoScan] = await Promise.all([
-    rpc<{ total: number; sessions: { sessionId: string; workspaceName: string; requestCount: number; firstMessage: string; creationDate: number | null; lastMessageDate: number | null }[] }>('getSessions', { page: 1, pageSize: 500, filter: filter as Record<string, unknown> }),
-    rpc<{ mcpServers: McpServer[] }>('getSdlcToolAnalysis', { filter: filter as Record<string, unknown> }),
+    rpc<{ total: number; sessions: { sessionId: string; workspaceName: string; requestCount: number; firstMessage: string; creationDate: number | null; lastMessageDate: number | null }[] }>('getSessions', { page: 1, pageSize: 500, filter: filter }),
+    rpc<{ mcpServers: McpServer[] }>('getSdlcToolAnalysis', { filter: filter }),
     rpc<{ repos: RepoScan[] }>('getSdlcRepoScan', {}),
   ]);
 

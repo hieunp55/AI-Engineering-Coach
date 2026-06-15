@@ -48,7 +48,7 @@ function sortWorkspacesBySessions(workspaces: WorkspaceContextScore[]): Workspac
 }
 
 export async function renderContextManagement(container: HTMLElement, currentFilter: DateFilter): Promise<void> {
-  const data = await rpc<ContextManagementData>('getContextManagement', { filter: currentFilter } as Record<string, unknown>);
+  const data = await rpc<ContextManagementData>('getContextManagement', { filter: currentFilter });
 
   if (data.totalSessions === 0) {
     render(html`

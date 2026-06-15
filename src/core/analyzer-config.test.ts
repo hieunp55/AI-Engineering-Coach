@@ -77,7 +77,7 @@ function makeWorkspace(overrides: Partial<Workspace> = {}): Workspace {
     name: 'TestProject',
     path: '/fake/root/ws-1',
     ...overrides,
-  } as Workspace;
+  };
 }
 
 function makeConfigFile(overrides: Partial<ConfigFileInfo> = {}): ConfigFileInfo {

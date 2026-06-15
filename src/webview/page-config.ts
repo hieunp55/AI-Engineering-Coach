@@ -91,7 +91,7 @@ export async function renderConfigHealth(container: HTMLElement, currentFilter: 
         harnessesWithoutRequestTokens: string[];
       }>(
         'getContextRangeAvailability',
-        { filter: { ...currentFilter, fromDate: undefined, toDate: undefined } } as Record<string, unknown>,
+        { filter: { ...currentFilter, fromDate: undefined, toDate: undefined } },
       );
       const allowed = new Set(avail.rangesWithTokens);
       visibleRanges = ALL_RANGES.filter(r => allowed.has(r.days));
@@ -369,7 +369,7 @@ async function runContextReview(workspaces: WorkspaceConfigHealth[]): Promise<vo
     </div>`, resultsEl);
 
   try {
-    const result = await rpc<{ reviews?: ContextReviewResult[]; error?: string }>('reviewContextFiles', { workspaceIds: wsIds, count: reviewCount } as Record<string, unknown>);
+    const result = await rpc<{ reviews?: ContextReviewResult[]; error?: string }>('reviewContextFiles', { workspaceIds: wsIds, count: reviewCount });
 
     if (result.error) {
       render(html`<div style="margin:16px 0;padding:12px 16px;border-radius:6px;border-left:3px solid ${COLORS.red};background:rgba(248,81,73,0.06);font-size:13px;color:${COLORS.red};">Review failed: ${result.error}</div>`, resultsEl);
