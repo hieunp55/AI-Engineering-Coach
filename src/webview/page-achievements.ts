@@ -495,9 +495,9 @@ export async function renderAchievements(container: HTMLElement, filter: DateFil
     { hours: [] },
   ] as const);
 
-  const sessions = await rpc<{ total: number; sessions: { sessionId: string; requestCount: number; firstMessage: string }[] }>('getSessions', { page: 1, pageSize: 100, filter: filter as Record<string, unknown> });
+  const sessions = await rpc<{ total: number; sessions: { sessionId: string; requestCount: number; firstMessage: string }[] }>('getSessions', { page: 1, pageSize: 100, filter: filter });
   const dailyActivity = await rpc<DailyActivity>('getDailyActivity',  filter as Record<string, unknown>);
-  const allSessions = await rpc<{ total: number }>('getSessions', { page: 1, pageSize: 1, filter: filter as Record<string, unknown> });
+  const allSessions = await rpc<{ total: number }>('getSessions', { page: 1, pageSize: 1, filter: filter });
   const codeByLang = await rpc<{ byLanguage: { labels: string[] } }>('getCodeProduction',  filter as Record<string, unknown>);
   const consumption = await rpc<{ modelTotals: Record<string, number> }>('getConsumption',  filter as Record<string, unknown>);
   const workflows = await rpc<{ clusters: { id: string }[] }>('getWorkflowOptimization',  filter as Record<string, unknown>);
@@ -554,7 +554,7 @@ export async function renderAchievements(container: HTMLElement, filter: DateFil
       const filtered = cat === 'all' ? evaluated : evaluated.filter(a => a.category === cat);
       const fUnlocked = filtered.filter(a => a.result.unlocked);
       const fLocked = filtered.filter(a => !a.result.unlocked).sort((a, b) => b.result.progress - a.result.progress);
-      render(renderAchList(fUnlocked, fLocked), list as HTMLElement);
+      render(renderAchList(fUnlocked, fLocked), list);
       wireShareButtons(container);
     });
   }

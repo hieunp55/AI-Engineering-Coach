@@ -6,6 +6,7 @@
 /* Webview entry -- runs in the browser context inside the VS Code webview */
 
 import { AntiPatternData, DateFilter, StatsResult } from '../core/types';
+import { FF_TOKEN_REPORTING_ENABLED } from '../core/constants';
 import { $, $$, rpc, destroyCharts, initMessageListener, withErrorBoundary } from './shared';
 import { html, render, unmount, ComponentChildren } from './render';
 import { renderDashboard } from './page-dashboard';
@@ -21,7 +22,6 @@ import { renderLevelUp } from './page-experiments';
 import { renderDataExplorer } from './page-data-explorer';
 import { renderRulePlayground } from './page-rule-playground';
 import { renderImageGallery } from './page-image-gallery';
-import { FF_TOKEN_REPORTING_ENABLED } from '../core/constants';
 
 function normalizePageForFeatureFlags(page: string): string {
   if (!FF_TOKEN_REPORTING_ENABLED && page === 'burndown') return 'dashboard';

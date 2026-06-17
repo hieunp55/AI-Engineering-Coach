@@ -20,6 +20,8 @@ function isObj(v: unknown): v is Record<string, unknown> {
 
 export function harnessFromPath(logsDir: string): string {
   if (logsDir.includes('Code - Insiders')) return 'Local Agent (Insiders)';
+  if (logsDir.includes('antigravity-ide-insiders') || logsDir.includes('Antigravity IDE - Insiders')) return 'Antigravity IDE (Insiders)';
+  if (logsDir.includes('antigravity-ide') || logsDir.includes('Antigravity IDE')) return 'Antigravity IDE';
   // Check .vscode-server-insiders BEFORE .vscode-server — the latter is a
   // substring of the former and would match incorrectly if checked first.
   if (logsDir.includes('.vscode-server-insiders')) return 'Local Agent (Server Insiders)';
@@ -32,7 +34,11 @@ export function findVsCodeDirs(): string[] {
   const dirs: string[] = [];
   const home = process.env.HOME || process.env.USERPROFILE || '';
 
-  const editionFolders = ['Code', 'Code - Insiders'];
+  const editionFolders = [
+    'Code', 'Code - Insiders',
+    'antigravity-ide', 'antigravity-ide-insiders',
+    'Antigravity IDE', 'Antigravity IDE - Insiders'
+  ];
 
   for (const edition of editionFolders) {
     let vsPath: string | undefined;
@@ -44,6 +50,13 @@ export function findVsCodeDirs(): string[] {
       vsPath = path.join(home, '.config', edition, 'User', 'workspaceStorage');
     }
     if (vsPath && fs.existsSync(vsPath) && !dirs.includes(vsPath)) dirs.push(vsPath);
+  }
+
+  // Custom .gemini paths for Antigravity IDE
+  const geminiPaths = ['antigravity-ide', 'antigravity-ide-insiders'];
+  for (const p of geminiPaths) {
+    const gp = path.join(home, '.gemini', p, 'User', 'workspaceStorage');
+    if (fs.existsSync(gp) && !dirs.includes(gp)) dirs.push(gp);
   }
 
   // VS Code Server only runs on the remote host (Linux/macOS), not on Windows directly.
@@ -809,9 +822,9 @@ function extractRequestVariables(req: RawRequest, resp: RawRequest['response'], 
 }
 
 function extractResultMetadata(result: RawRequest['result']): ParsedResultMetadata {
-  const resultObj = (typeof result === 'object' && result ? result : null) as Record<string, unknown> | null;
+  const resultObj = (typeof result === 'object' && result ? result : null);
   const resultMeta = resultObj?.metadata;
-  const meta = (typeof resultMeta === 'object' && resultMeta ? resultMeta : {}) as Record<string, unknown>;
+  const meta = (typeof resultMeta === 'object' && resultMeta ? resultMeta : {});
   return {
     resultObj,
     meta,
@@ -955,7 +968,7 @@ export function parseSessionFile(sessionFile: string, wsId: string, wsName: stri
     if (sessionFile.endsWith('.jsonl')) {
       const result = reconstructFromJsonl(sessionFile);
       if (!result) return null;
-      data = result as SessionFileData;
+      data = result;
     } else {
       data = JSON.parse(stripImageData(readFile(sessionFile))) as SessionFileData;
     }

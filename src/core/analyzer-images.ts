@@ -261,7 +261,7 @@ export class ImageAnalyzer extends AnalyzerBase {
       if (sessionMoments.length < 2) continue; // single-image sessions aren't stories
       const sorted = [...sessionMoments].sort((a, b) => a.turnNumber - b.turnNumber);
       const allFiles = new Set<string>();
-      for (const m of sorted) m.editedFiles.forEach(f => allFiles.add(f));
+      for (const m of sorted) for (const f of m.editedFiles) allFiles.add(f);
       const modelCounts = new Map<string, number>();
       for (const m of sorted) modelCounts.set(m.model, (modelCounts.get(m.model) ?? 0) + 1);
       const topModel = maxEntry(modelCounts) ?? sorted[0].model;
@@ -322,7 +322,7 @@ export class ImageAnalyzer extends AnalyzerBase {
 
 function truncate(text: string, max: number): string {
   if (!text) return '';
-  const clean = text.replace(/\s+/g, ' ').trim();
+  const clean = text.replaceAll(/\s+/g, ' ').trim();
   return clean.length <= max ? clean : clean.slice(0, max - 1) + '\u2026';
 }
 

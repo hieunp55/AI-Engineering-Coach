@@ -323,19 +323,44 @@ const LLM_FAMILY = 'gpt-5.4-mini';
 const LLM_REQUEST_TIMEOUT_MS = 90_000;
 
 /**
- * Pick a Copilot chat model. Tries the preferred family first, then a short
- * fallback list, then any available model. Throws a descriptive error when
- * nothing is available so callers can surface a useful message.
+ * Pick a chat model. Tries the preferred family first, then vendor, then any
+ * available model. Throws a descriptive error when nothing is available.
  */
 async function selectModel(): Promise<vscode.LanguageModelChat> {
-  const families = [LLM_FAMILY, 'gpt-5-mini', 'gpt-4.1-mini', 'gpt-4.1'];
+  const families = ['antigravity', 'gemini', 'google', LLM_FAMILY, 'gpt-5-mini', 'gpt-4.1-mini', 'gpt-4.1', 'codex'];
   for (const family of families) {
     const models = await vscode.lm.selectChatModels({ family });
     if (models.length > 0) return models[0];
   }
-  const any = await vscode.lm.selectChatModels({});
+  const vendors = ['antigravity', 'gemini', 'google', 'copilot', 'codex'];
+  for (const vendor of vendors) {
+    const models = await vscode.lm.selectChatModels({ vendor });
+    if (models.length > 0) return models[0];
+  }
+  let any = await vscode.lm.selectChatModels({});
   if (any.length > 0) return any[0];
-  throw new Error('No language model available. Make sure GitHub Copilot is installed and signed in.');
+
+  // If no models found, try to trigger sign-in for common providers
+  const providers = [
+    { id: 'antigravity', scopes: [] },
+    { id: 'github', scopes: ['read:user'] },
+    { id: 'google', scopes: ['email'] },
+    { id: 'microsoft', scopes: ['email'] }
+  ];
+
+  for (const provider of providers) {
+    try {
+      await vscode.authentication.getSession(provider.id, provider.scopes, { createIfNone: true });
+      // Wait a moment for models to register after auth
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      any = await vscode.lm.selectChatModels({});
+      if (any.length > 0) return any[0];
+    } catch {
+      // Ignore auth failures or missing providers
+    }
+  }
+
+  throw new Error('No language model available. Make sure GitHub Copilot, Codex, or Antigravity IDE is installed and signed in.');
 }
 
 /** Race a promise against a timeout. Rejects with a clear message on timeout. */
@@ -349,7 +374,81 @@ function withTimeout<T>(p: Promise<T>, ms: number, label: string): Promise<T> {
   });
 }
 
+function getGoogleApiKey(): string {
+  return (
+    process.env.GOOGLE_GEMINI_API_KEY?.trim()
+    || process.env.GEMINI_API_KEY?.trim()
+    || process.env.GOOGLE_API_KEY?.trim()
+    || ''
+  );
+}
+
+async function callGeminiApi(apiKey: string, messages: vscode.LanguageModelChatMessage[], jsonSchema?: JsonSchemaSpec): Promise<string> {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${apiKey}`;
+
+  const contents = messages.map(m => ({
+    role: m.role === vscode.LanguageModelChatMessageRole.User ? 'user' : 'model',
+    parts: [{ text: typeof m.content === 'string' ? m.content : (m.content[0] as { value: string }).value }]
+  }));
+
+  interface GeminiRequest {
+    contents: Array<{ role: string; parts: Array<{ text: string }> }>;
+    generationConfig?: {
+      responseMimeType: string;
+      responseSchema: Record<string, unknown>;
+    };
+  }
+
+  const body: GeminiRequest = { contents };
+  if (jsonSchema) {
+    // Gemini API does not support additionalProperties in the schema
+    const stripAdditionalProperties = (obj: unknown): unknown => {
+      if (Array.isArray(obj)) return obj.map(stripAdditionalProperties);
+      if (typeof obj === 'object' && obj !== null) {
+        const newObj: Record<string, unknown> = {};
+        for (const key in obj) {
+          if (key === 'additionalProperties') continue;
+          newObj[key] = stripAdditionalProperties((obj as Record<string, unknown>)[key]);
+        }
+        return newObj;
+      }
+      return obj;
+    };
+
+    body.generationConfig = {
+      responseMimeType: "application/json",
+      responseSchema: stripAdditionalProperties(jsonSchema.schema) as Record<string, unknown>
+    };
+  }
+
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Google API Error: ${err}`);
+  }
+
+  interface GeminiResponse {
+    candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
+  }
+  const data = await res.json() as GeminiResponse;
+  if (!data.candidates?.[0]?.content?.parts?.[0]?.text) {
+    throw new Error('Unexpected Google API response structure');
+  }
+
+  return data.candidates[0].content.parts[0].text;
+}
+
 export async function callLlm(messages: vscode.LanguageModelChatMessage[]): Promise<string> {
+  const apiKey = getGoogleApiKey();
+  if (apiKey) {
+    return await callGeminiApi(apiKey, messages);
+  }
+
   const model = await selectModel();
 
   let lastError: unknown;
@@ -375,6 +474,16 @@ export async function callLlm(messages: vscode.LanguageModelChatMessage[]): Prom
 }
 
 export async function callLlmJson<T>(messages: vscode.LanguageModelChatMessage[], jsonSchema?: JsonSchemaSpec): Promise<T> {
+  const apiKey = getGoogleApiKey();
+  if (apiKey) {
+    const text = await callGeminiApi(apiKey, messages, jsonSchema);
+    try {
+      return JSON.parse(text.trim()) as T;
+    } catch {
+      return parseLlmJson<T>(text);
+    }
+  }
+
   const model = await selectModel();
 
   const options: vscode.LanguageModelChatRequestOptions = jsonSchema
@@ -405,7 +514,7 @@ export async function callLlmJson<T>(messages: vscode.LanguageModelChatMessage[]
       if (err instanceof vscode.CancellationError) { cts.dispose(); throw err; }
       // Drop structured output so later attempts can recover in plain mode.
       if (jsonSchema && options.modelOptions && lastError instanceof Error &&
-          /response_format|modelOptions|not supported|JSON|parse/i.test(lastError.message)) {
+        /response_format|modelOptions|not supported|JSON|parse/i.test(lastError.message)) {
         options.modelOptions = undefined;
       }
       // On parse failures, nudge the model to return valid JSON on the next attempt

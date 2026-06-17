@@ -384,7 +384,7 @@ describe('Analyzer', () => {
 
     it('harness filter propagates to getCodeProduction', () => {
       const a = new Analyzer(sessions);
-      const filter = validateDateFilter({ harness: 'Codex' } as Record<string, unknown>);
+      const filter = validateDateFilter({ harness: 'Codex' });
       const prod = a.getCodeProduction(filter);
       // s4 has 1 request with default aiCode [{ language: 'typescript', loc: 10 }]
       expect(prod.summary.totalAiLoc).toBe(10);
@@ -393,19 +393,19 @@ describe('Analyzer', () => {
     it('harness filter propagates to getConsumption', () => {
       const a = new Analyzer(sessions);
       // Filter by Local Agent — s1 has 2 requests, s3 has 3.
-      const filter = validateDateFilter({ harness: 'Local Agent' } as Record<string, unknown>);
+      const filter = validateDateFilter({ harness: 'Local Agent' });
       const cons = a.getConsumption(filter);
       expect(cons.totalRequests).toBe(5); // s1(2) + s3(3)
 
       // Filter by Claude — only Claude sessions are included.
-      const claudeFilter = validateDateFilter({ harness: 'Claude' } as Record<string, unknown>);
+      const claudeFilter = validateDateFilter({ harness: 'Claude' });
       const claudeCons = a.getConsumption(claudeFilter);
       expect(claudeCons.totalRequests).toBe(1);
     });
 
     it('harness filter propagates to getWorkspaceBreakdown', () => {
       const a = new Analyzer(sessions);
-      const filter = validateDateFilter({ harness: 'Local Agent' } as Record<string, unknown>);
+      const filter = validateDateFilter({ harness: 'Local Agent' });
       const wb = a.getWorkspaceBreakdown(filter);
       // Local Agent sessions are in alpha(s1) and beta(s3)
       expect(wb.labels).toContain('alpha');
@@ -417,7 +417,7 @@ describe('Analyzer', () => {
     it('harness filter propagates to getHarnessBreakdown', () => {
       const a = new Analyzer(sessions);
       // When filtered to Local Agent, harnessBreakdown should only show Local Agent
-      const filter = validateDateFilter({ harness: 'Local Agent' } as Record<string, unknown>);
+      const filter = validateDateFilter({ harness: 'Local Agent' });
       const hb = a.getHarnessBreakdown(filter);
       expect(hb.labels).toEqual(['Local Agent']);
       expect(hb.requests[0]).toBe(5);

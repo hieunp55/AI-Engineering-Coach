@@ -78,7 +78,7 @@ export function getExperiments(): Record<ExperimentKey, boolean> {
   for (const key of EXPERIMENT_KEYS) {
     result[key] = saved[key] !== false; // default true
   }
-  return result as Record<ExperimentKey, boolean>;
+  return result;
 }
 
 export function setExperiment(key: ExperimentKey, enabled: boolean): void {

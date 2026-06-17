@@ -185,7 +185,7 @@ export function evaluateMetric(
   // Resolve threshold placeholders in the filter expression
   let resolvedFilter = filterExpr;
   if (thresholds) {
-    resolvedFilter = fillTemplate(filterExpr, { thresholds } as unknown as Record<string, unknown>);
+    resolvedFilter = fillTemplate(filterExpr, { thresholds });
   }
 
   const filterFn = compileFilter(resolvedFilter);
@@ -240,7 +240,7 @@ export function evaluateTrigger(
 
   let resolved = triggerExpr;
   if (thresholds) {
-    resolved = fillTemplate(triggerExpr, { thresholds } as unknown as Record<string, unknown>);
+    resolved = fillTemplate(triggerExpr, { thresholds });
   }
 
   const triggerFn = compileTrigger(resolved);

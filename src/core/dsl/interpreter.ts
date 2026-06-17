@@ -133,7 +133,7 @@ function evaluateFieldAccess(node: ASTNode & { type: 'field_access' }, ctx: Reco
   if (typeof obj === 'object') {
     const field = node.field;
     if (field === '__proto__' || field === 'constructor' || field === 'prototype') return undefined;
-    return Object.hasOwn(obj as Record<string, unknown>, field)
+    return Object.hasOwn(obj, field)
       ? (obj as Record<string, unknown>)[field]
       : undefined;
   }

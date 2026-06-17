@@ -112,7 +112,7 @@ export function validateSessions(sessions: unknown[], source: string): Session[]
   for (const s of sessions) {
     const result = SessionSchema.safeParse(s);
     if (result.success) {
-      valid.push(result.data as Session);
+      valid.push(result.data);
     } else {
       warnCore('schema', `Invalid session from ${source}: ${result.error.issues[0]?.message ?? 'unknown'}`);
     }

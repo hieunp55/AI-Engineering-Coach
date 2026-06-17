@@ -190,7 +190,7 @@ async function runAnalysis(): Promise<void> {
         examples: c.examples.slice(0, 5),
       })),
       workspace: workspaceName,
-    } as Record<string, unknown>);
+    });
 
     const strong = (result.triaged || []).filter(t => t.verdict === 'strong').slice(0, 10);
     lastTriaged = strong;
@@ -278,7 +278,7 @@ function renderTriageResults(container: HTMLElement, triaged: TriagedCluster[], 
             sessions: cluster.sessions,
             examples: cluster.examples.slice(0, 5),
             skillDraft: cluster.skillDraft,
-          } as Record<string, unknown>);
+          });
 
           const previewEl = el.parentElement?.querySelector<HTMLElement>('.sk-card-preview');
           if (previewEl) {
@@ -295,7 +295,7 @@ function renderTriageResults(container: HTMLElement, triaged: TriagedCluster[], 
             previewEl.querySelector<HTMLElement>('.sk-btn-confirm')?.addEventListener('click', () => {
               void (async () => {
                 try {
-                  await rpc<{ ok: boolean }>('installSkill', { filename: res.filename, content: res.content } as Record<string, unknown>);
+                  await rpc<{ ok: boolean }>('installSkill', { filename: res.filename, content: res.content });
                   el.textContent = 'Installed';
                   el.classList.add('sk-btn-done');
                   render(html`<span class="sk-installed-msg">Skill installed to ~/.agents/skills/</span>`, previewEl);
@@ -349,7 +349,7 @@ const kindColors: Record<string, string> = {
 async function loadCatalog(container: HTMLElement, clusters: WorkflowCluster[], workspace?: string): Promise<CatalogItem[]> {
   try {
     // Fetch ALL catalog items (no pre-filtering)
-    const result = await rpc<CatalogDiscoverResult>('discoverCatalog', {} as Record<string, unknown>);
+    const result = await rpc<CatalogDiscoverResult>('discoverCatalog', {});
     if (!result.items || result.items.length === 0) {
       render(html`<p class="sk-empty">No items found in the community catalog.</p>`, container);
       return [];
@@ -367,7 +367,7 @@ async function loadCatalog(container: HTMLElement, clusters: WorkflowCluster[], 
         items: result.items,
         clusters: topClusters,
         workspace: workspace || undefined,
-      } as Record<string, unknown>);
+      });
 
       const items = triaged.items && triaged.items.length > 0 ? triaged.items : [];
       if (items.length === 0) {
@@ -408,7 +408,7 @@ function renderCatalogList(container: HTMLElement, items: CatalogItem[], totalSc
         try {
           const res = await rpc<{ content: string; filename: string }>('installCatalogItem', {
             path, kind, title,
-          } as Record<string, unknown>);
+          });
 
           el.textContent = 'Installed';
           el.classList.add('sk-btn-done');

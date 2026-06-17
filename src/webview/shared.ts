@@ -325,6 +325,9 @@ export const HARNESS_COLORS: Record<string, string> = {
 
   'Codex': '#10b981',
   'OpenCode': '#8b5cf6',
+  'Antigravity IDE': '#9333ea',
+  'Antigravity IDE (Insiders)': '#a855f7',
+  'KIRO IDE': '#e11d48',
 };
 
 export function harnessColor(name: string, idx: number): string {

@@ -309,19 +309,21 @@ describe('parseSessionFile (VS Code chat) — endState', () => {
 describe('parseSessionFile token extraction', () => {
   it('prefers request-level completionTokens over metadata.outputTokens', () => {
     const lines = [
-      JSON.stringify({ kind: 0, v: {
-        creationDate: 1700000000000,
-        lastMessageDate: 1700000001000,
-        sessionId: 'token-test-1',
-        requests: [{
-          requestId: 'req-1',
-          timestamp: 1700000001000,
-          message: { text: 'hello' },
-          response: [{ value: 'world' }],
-          modelId: 'claude-opus-4-6',
-          result: { timings: { totalElapsed: 5000 }, metadata: { promptTokens: 1000, outputTokens: 50 } },
-        }],
-      }}),
+      JSON.stringify({
+        kind: 0, v: {
+          creationDate: 1700000000000,
+          lastMessageDate: 1700000001000,
+          sessionId: 'token-test-1',
+          requests: [{
+            requestId: 'req-1',
+            timestamp: 1700000001000,
+            message: { text: 'hello' },
+            response: [{ value: 'world' }],
+            modelId: 'claude-opus-4-6',
+            result: { timings: { totalElapsed: 5000 }, metadata: { promptTokens: 1000, outputTokens: 50 } },
+          }],
+        }
+      }),
       // Streaming counter patches — final value should win
       JSON.stringify({ kind: 1, k: ['requests', 0, 'completionTokens'], v: 200 }),
       JSON.stringify({ kind: 1, k: ['requests', 0, 'completionTokens'], v: 450 }),
@@ -338,18 +340,20 @@ describe('parseSessionFile token extraction', () => {
 
   it('falls back to metadata.outputTokens when request-level completionTokens is absent', () => {
     const lines = [
-      JSON.stringify({ kind: 0, v: {
-        creationDate: 1700000000000,
-        sessionId: 'token-test-2',
-        requests: [{
-          requestId: 'req-1',
-          timestamp: 1700000001000,
-          message: { text: 'hello' },
-          response: [{ value: 'world' }],
-          modelId: 'gpt-4.1',
-          result: { timings: { totalElapsed: 3000 }, metadata: { promptTokens: 2000, outputTokens: 300 } },
-        }],
-      }}),
+      JSON.stringify({
+        kind: 0, v: {
+          creationDate: 1700000000000,
+          sessionId: 'token-test-2',
+          requests: [{
+            requestId: 'req-1',
+            timestamp: 1700000001000,
+            message: { text: 'hello' },
+            response: [{ value: 'world' }],
+            modelId: 'gpt-4.1',
+            result: { timings: { totalElapsed: 3000 }, metadata: { promptTokens: 2000, outputTokens: 300 } },
+          }],
+        }
+      }),
     ].join('\n');
 
     withTempFile('session-meta-only.jsonl', lines, (filePath) => {
@@ -373,6 +377,16 @@ describe('harnessFromPath', () => {
 
   it('returns Local Agent for standard VS Code paths', () => {
     expect(harnessFromPath('/home/user/Library/Application Support/Code/User/workspaceStorage')).toBe('Local Agent');
+  });
+
+  it('returns Antigravity IDE for antigravity-ide paths', () => {
+    expect(harnessFromPath('/home/user/.gemini/antigravity-ide/User/workspaceStorage')).toBe('Antigravity IDE');
+    expect(harnessFromPath('/home/user/AppData/Roaming/Antigravity IDE/User/workspaceStorage')).toBe('Antigravity IDE');
+  });
+
+  it('returns Antigravity IDE (Insiders) for antigravity-ide-insiders paths', () => {
+    expect(harnessFromPath('/home/user/.gemini/antigravity-ide-insiders/User/workspaceStorage')).toBe('Antigravity IDE (Insiders)');
+    expect(harnessFromPath('/home/user/AppData/Roaming/Antigravity IDE - Insiders/User/workspaceStorage')).toBe('Antigravity IDE (Insiders)');
   });
 });
 
@@ -543,17 +557,19 @@ describe('parseSessionFile — basic VS Code session', () => {
 
   it('parses JSONL session files', () => {
     const lines = [
-      JSON.stringify({ kind: 0, v: {
-        sessionId: 'jsonl-test',
-        creationDate: 1700000000000,
-        requests: [{
-          requestId: 'r1',
-          timestamp: 1700000001000,
-          message: { text: 'hi' },
-          response: [{ value: 'hello' }],
-          result: { metadata: {} },
-        }],
-      }}),
+      JSON.stringify({
+        kind: 0, v: {
+          sessionId: 'jsonl-test',
+          creationDate: 1700000000000,
+          requests: [{
+            requestId: 'r1',
+            timestamp: 1700000001000,
+            message: { text: 'hi' },
+            response: [{ value: 'hello' }],
+            result: { metadata: {} },
+          }],
+        }
+      }),
     ].join('\n');
     withTempFile('test.jsonl', lines, (filePath) => {
       const session = parseSessionFile(filePath, 'ws', 'wp', 'Local Agent');
@@ -794,3 +810,42 @@ describe('findVsCodeDirs — VS Code Server', () => {
     }
   });
 });
+
+describe('findVsCodeDirs — Antigravity IDE', () => {
+  it('includes antigravity-ide and custom .gemini paths', () => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'ai-engineer-coach-antigravity-'));
+    const home = process.env.HOME;
+    const userProfile = process.env.USERPROFILE;
+    const realPlatform = process.platform;
+
+    const expectedConfig = [
+      path.join(root, '.config', 'antigravity-ide', 'User', 'workspaceStorage'),
+      path.join(root, '.config', 'antigravity-ide-insiders', 'User', 'workspaceStorage'),
+    ];
+    const expectedGemini = [
+      path.join(root, '.gemini', 'antigravity-ide', 'User', 'workspaceStorage'),
+      path.join(root, '.gemini', 'antigravity-ide-insiders', 'User', 'workspaceStorage'),
+    ];
+
+    for (const dir of [...expectedConfig, ...expectedGemini]) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+
+    process.env.HOME = root;
+    process.env.USERPROFILE = '';
+    Object.defineProperty(process, 'platform', { value: 'linux', configurable: true });
+
+    try {
+      const result = findVsCodeDirs();
+      for (const pathVal of [...expectedConfig, ...expectedGemini]) {
+        expect(result).toContain(pathVal);
+      }
+    } finally {
+      process.env.HOME = home;
+      process.env.USERPROFILE = userProfile;
+      Object.defineProperty(process, 'platform', { value: realPlatform, configurable: true });
+      fs.rmSync(root, { recursive: true, force: true });
+    }
+  });
+});
+

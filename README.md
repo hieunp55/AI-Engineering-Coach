@@ -7,7 +7,7 @@ Analyze your AI coding assistant usage — any harness, one dashboard.
 
 <p align="center">
 <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
-<img alt="VS Code 1.115+" src="https://img.shields.io/badge/VS%20Code-1.115%2B-007ACC">
+<img alt="VS Code 1.107+" src="https://img.shields.io/badge/VS%20Code-1.107%2B-007ACC">
 </p>
 
 <br>
@@ -29,6 +29,26 @@ AI Engineer Coach reads your local AI session logs and turns them into actionabl
 - **Measure output** -- AI-generated code volume by language, workspace, model, and harness
 - **Discover skills** -- find repeated prompts and turn them into reusable skills
 - **Score context health** — agentic readiness checks, instruction-file audits, workspace context maps
+
+---
+
+## Supported Harnesses
+
+| Harness | Default location |
+| --- | --- |
+| **Local Agent** | macOS: `~/Library/Application Support/Code/User/workspaceStorage/`<br>Linux: `~/.config/Code/User/workspaceStorage/`<br>Windows: `%APPDATA%\Code\User\workspaceStorage\` |
+| **Local Agent (Insiders)** | macOS: `~/Library/Application Support/Code - Insiders/User/workspaceStorage/`<br>Linux: `~/.config/Code - Insiders/User/workspaceStorage/`<br>Windows: `%APPDATA%\Code - Insiders\User\workspaceStorage\` |
+| **Local Agent (Server)** | Linux/macOS remote host: `~/.vscode-server/data/User/workspaceStorage/` |
+| **Local Agent (Server Insiders)** | Linux/macOS remote host: `~/.vscode-server-insiders/data/User/workspaceStorage/` |
+| **Antigravity IDE** | macOS: `~/Library/Application Support/antigravity-ide/User/workspaceStorage/` or `~/.gemini/antigravity-ide/User/workspaceStorage/`<br>Linux: `~/.config/antigravity-ide/User/workspaceStorage/` or `~/.gemini/antigravity-ide/User/workspaceStorage/`<br>Windows: `%APPDATA%\Antigravity IDE\User\workspaceStorage\` |
+| **Antigravity IDE (Insiders)** | macOS: `~/Library/Application Support/antigravity-ide-insiders/User/workspaceStorage/` or `~/.gemini/antigravity-ide-insiders/User/workspaceStorage/`<br>Linux: `~/.config/antigravity-ide-insiders/User/workspaceStorage/` or `~/.gemini/antigravity-ide-insiders/User/workspaceStorage/`<br>Windows: `%APPDATA%\Antigravity IDE - Insiders\User\workspaceStorage\` |
+| **Antigravity IDE transcripts** | `~/.gemini/antigravity-ide/brain/` and `~/.gemini/antigravity-ide-insiders/brain/` |
+| **KIRO IDE** | macOS: `~/Library/Application Support/Kiro/User/globalStorage/kiro.kiroagent/workspace-sessions/`<br>Linux: `~/.config/Kiro/User/globalStorage/kiro.kiroagent/workspace-sessions/`<br>Windows: `%APPDATA%\Kiro\User\globalStorage\kiro.kiroagent\workspace-sessions\` |
+| **Xcode Copilot Chat** | `~/.config/github-copilot/xcode/` (requires `sqlite3`) |
+| **Claude** | macOS/Linux: `~/.claude/projects/`<br>Windows: `%USERPROFILE%\.claude\projects\` |
+| **Codex** | macOS/Linux/Windows: `~/.codex/sessions/`, `~/.codex/archived_sessions/`, `~/.codex/archived-sessions/` |
+| **OpenCode** | macOS: `~/Library/Application Support/opencode/storage/`<br>Linux/Windows: `~/.local/share/opencode/storage/` |
+| **GitHub Copilot CLI** | `~/.copilot/session-state/` and `~/.copilot/history-session-state/` |
 
 <details>
 <summary><strong>Screenshots</strong></summary>
@@ -179,7 +199,7 @@ After install:
 - **Read-only** — the extension never modifies your session files
 - **Local analysis** — all parsing and analytics run entirely on your machine
 - **No proprietary telemetry** — the extension does not phone home or collect usage data
-- **Optional AI features** — some features (rule compiler, skill finder, context review) use the VS Code built-in Copilot language model API when explicitly invoked by the user
+- **Optional AI features** — some features (rule compiler, skill finder, context review) use the VS Code built-in language model API when explicitly invoked by the user; if `GOOGLE_GEMINI_API_KEY`, `GEMINI_API_KEY`, or `GOOGLE_API_KEY` is set, Gemini REST is used as an explicit fallback
 
 ---
 

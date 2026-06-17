@@ -26,7 +26,7 @@ import { parseRule, serializeRule } from '../core/rule-parser';
 import { getRuleLayerInfo, getPersonalRulesDir, getProjectRulesDir } from '../core/rule-loader';
 import { getPending, approve as approveTrust, getDefaultTrustStore } from '../core/rule-trust';
 import { isoWeek } from '../core/helpers';
-import { FIELD_SCHEMA, METRIC_PRIMITIVES, FUNCTION_CATALOG, compileFilter, validateExpression  } from '../core/dsl/index';
+import { FIELD_SCHEMA, METRIC_PRIMITIVES, FUNCTION_CATALOG, compileFilter, validateExpression } from '../core/dsl/index';
 import {
   getAllMetrics,
   parseRuleExtensions,
@@ -36,9 +36,9 @@ import {
 } from '../core/metric-engine';
 import { compileNaturalLanguageRule } from '../core/rule-compiler';
 import type { SessionRequest, Session } from '../core/types';
+import { FF_TOKEN_REPORTING_ENABLED } from '../core/constants';
 import { errorResult, isString, isNumber, isOptionalString, isRecord } from './panel-shared';
 import { DSL_CHEATSHEET } from './dsl-cheatsheet';
-import { FF_TOKEN_REPORTING_ENABLED } from '../core/constants';
 
 /**
  * Pick `reqs` or `sessions` based on scope and return them typed as
@@ -757,7 +757,7 @@ const rpcHandlers: TypedRpcHandlers = {
     const filter = validateDateFilter(params);
     const reqs = a.filterRequests(filter);
     const sessions = a.filterSessions(filter);
-    const skipIde = !!(filter?.harness && !filter.harness.startsWith('Local Agent') && filter.harness !== 'Xcode');
+    const skipIde = !!(filter?.harness && !filter.harness.startsWith('Local Agent') && !filter.harness.startsWith('Antigravity IDE') && filter.harness !== 'Xcode');
     const detectorResults = runDetectors(reqs, sessions, skipIde);
     const emissions = runEmitters(reqs, sessions, skipIde);
     const previews = getRulePreviewStats(reqs, sessions, skipIde, detectorResults, emissions);
@@ -816,11 +816,13 @@ const rpcHandlers: TypedRpcHandlers = {
       }
     }
 
-    return { rules, previews, layers, dateHistograms, pending: getPending().map(p => ({
-      filePath: p.filePath,
-      layer: p.layer,
-      kind: p.kind,
-    })) };
+    return {
+      rules, previews, layers, dateHistograms, pending: getPending().map(p => ({
+        filePath: p.filePath,
+        layer: p.layer,
+        kind: p.kind,
+      }))
+    };
   },
 
   getRulePreview: (a, _p, params) => {
@@ -830,7 +832,7 @@ const rpcHandlers: TypedRpcHandlers = {
     const filter = validateDateFilter(params);
     const reqs = a.filterRequests(filter);
     const sessions = a.filterSessions(filter);
-    const skipIde = !!(filter?.harness && !filter.harness.startsWith('Local Agent') && filter.harness !== 'Xcode');
+    const skipIde = !!(filter?.harness && !filter.harness.startsWith('Local Agent') && !filter.harness.startsWith('Antigravity IDE') && filter.harness !== 'Xcode');
     const detectorResults = runDetectors(reqs, sessions, skipIde);
     const emissions = runEmitters(reqs, sessions, skipIde);
     const previews = getRulePreviewStats(reqs, sessions, skipIde, detectorResults, emissions);
@@ -983,7 +985,7 @@ Explain why this session triggered the rule.`;
       const filter = isRecord(params?.filter) ? validateDateFilter(params.filter) : undefined;
       const reqs = a.filterRequests(filter);
       const sessions = a.filterSessions(filter);
-      const skipIde = !!(filter?.harness && !filter.harness.startsWith('Local Agent') && filter.harness !== 'Xcode');
+      const skipIde = !!(filter?.harness && !filter.harness.startsWith('Local Agent') && !filter.harness.startsWith('Antigravity IDE') && filter.harness !== 'Xcode');
 
       // Enrich requests with session info (needed by rules that reference workspaceName/sessionId)
       const sessionMap = new Map<string, { sessionId: string; workspaceName: string }>();
@@ -1089,11 +1091,13 @@ Explain why this session triggered the rule.`;
   },
 
   getMetricList: () => {
-    return { metrics: getAllMetrics().map(m => ({
-      id: m.id, name: m.name, scope: m.scope, tags: m.tags,
-      filterExpr: m.filterExpr, aggregationExpr: m.aggregationExpr,
-      source: m.source,
-    })) };
+    return {
+      metrics: getAllMetrics().map(m => ({
+        id: m.id, name: m.name, scope: m.scope, tags: m.tags,
+        filterExpr: m.filterExpr, aggregationExpr: m.aggregationExpr,
+        source: m.source,
+      }))
+    };
   },
 
   evaluateExpression: (a, _p, params) => {

@@ -304,7 +304,7 @@ describe('parseClaudeSessions', () => {
     // lowercase drive letter, then replace :, \, /, and whitespace with -
     const encodedDirName = targetDir
       .replace(/^([a-zA-Z])(?=:)/, d => d.toLowerCase())
-      .replace(/[:\\/\s]/g, '-');
+      .replaceAll(/[:\\/\s]/g, '-');
 
     const root = fs.mkdtempSync(path.join(longTmpDir(), 'claude-proj-'));
     const projectsDir = path.join(root, 'projects');
@@ -335,7 +335,7 @@ describe('parseClaudeSessions', () => {
 
     const encodedDirName = targetDir
       .replace(/^([a-zA-Z])(?=:)/, d => d.toLowerCase())
-      .replace(/[:\\/\s]/g, '-');
+      .replaceAll(/[:\\/\s]/g, '-');
 
     const root = fs.mkdtempSync(path.join(longTmpDir(), 'claude-proj-'));
     const projectsDir = path.join(root, 'projects');
@@ -378,7 +378,7 @@ describe('parseClaudeSessions', () => {
     const symlinkTargetDir = path.join(symlinkDir, 'Documents', 'myapp');
     const encodedDirName = symlinkTargetDir
       .replace(/^([a-zA-Z])(?=:)/, d => d.toLowerCase())
-      .replace(/[:\\/\s]/g, '-');
+      .replaceAll(/[:\\/\s]/g, '-');
 
     const root = fs.mkdtempSync(path.join(longTmpDir(), 'claude-proj-'));
     const projectsDir = path.join(root, 'projects');

@@ -131,7 +131,7 @@ export class PanelRequestService {
     private readonly webview: vscode.Webview,
     private readonly getAnalyzer: () => Analyzer | undefined,
     private readonly getParseResult: () => ParseResult | undefined,
-  ) {}
+  ) { }
 
   tryHandle(msg: RequestMessage): boolean {
     if (!Object.prototype.hasOwnProperty.call(this.handlers, msg.method)) return false;
@@ -317,14 +317,19 @@ Generate 3 ${context.difficulty} interview-style questions tailored to this deve
     const examples = Array.isArray(params.examples) ? (params.examples as string[]).slice(0, 5) : [];
     const skillDraft = isString(params.skillDraft) ? params.skillDraft : '';
 
-    const systemPrompt = `You are an expert at writing SKILL.md files for VS Code GitHub Copilot.
-A skill file is a markdown instruction file that teaches Copilot how to handle a specific repeated workflow pattern.
+    const systemPrompt = `You are an expert at writing SKILL.md files for agentic AI coders following the official Anthropic skill-creator specification.
+A skill file is a markdown instruction file that teaches an agent how to handle a specific repeated workflow pattern.
 
-Generate a professional, production-ready SKILL.md file. Include:
-1. YAML frontmatter with: name, description, and an applyTo glob pattern
-2. A clear "## When to Use" section
-3. Detailed "## Steps" with numbered instructions the AI should follow
-4. A "## Guidelines" section with quality criteria
+Generate a professional, production-ready SKILL.md file following these strict guidelines:
+1. YAML frontmatter containing EXACTLY:
+   - name: a slug-style name (letters, numbers, hyphens only)
+   - description: starts with "Use when..." and describes ONLY the triggering conditions, symptoms, and context. Do NOT summarize the skill's process, steps, or workflow in the description.
+2. Title: A single H1 header with the skill name.
+3. "## Overview" section: Explain the core principle or purpose in 1-2 sentences.
+4. "## When to Use" section: List specific situations/symptoms when the skill should be used, and a clear "When NOT to use" list.
+5. "## Core Pattern" section: Show a before/after code comparison or workflow pattern comparison.
+6. "## Implementation" section: Detailed step-by-step instructions using imperative verbs.
+7. "## Common Mistakes" section: Document common errors or rationalizations and how to fix/avoid them.
 
 Respond with ONLY the markdown content of the SKILL.md file, nothing else.`;
 
@@ -428,16 +433,18 @@ Difficulty: ${difficulty}
 Generate 3 code comparison rounds for this developer's ecosystem. Mix the categories.`;
 
     try {
-      const response = await callLlmJson<{ items: Array<{
-        snippetA: string;
-        snippetB: string;
-        betterSnippet: string;
-        title: string;
-        category: string;
-        explanation: string;
-        difficulty: string;
-        language: string;
-      }> }>([
+      const response = await callLlmJson<{
+        items: Array<{
+          snippetA: string;
+          snippetB: string;
+          betterSnippet: string;
+          title: string;
+          category: string;
+          explanation: string;
+          difficulty: string;
+          language: string;
+        }>
+      }>([
         vscode.LanguageModelChatMessage.User(systemPrompt),
         vscode.LanguageModelChatMessage.User(userPrompt),
       ], SCHEMA_CODE_REVIEW);

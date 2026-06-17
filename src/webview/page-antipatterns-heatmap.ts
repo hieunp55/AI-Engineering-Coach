@@ -143,7 +143,7 @@ export async function renderCoverageHeatmap(container: HTMLElement, currentFilte
   render(html`<${Loading} />`, body);
 
   try {
-    const data = await rpc<CoverageData>('getRuleCoverage', { filter: currentFilter as Record<string, unknown> });
+    const data = await rpc<CoverageData>('getRuleCoverage', { filter: currentFilter });
 
     if (data.error) {
       render(html`<${ErrorMsg} message=${data.error} />`, body);

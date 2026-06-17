@@ -82,8 +82,35 @@ async function compileLlm(
   const lm = vscode.lm;
   if (!lm) return null;
 
-  const models = await lm.selectChatModels({ family: 'gpt-4.1' });
-  const model = models[0];
+  type LanguageModelChat = Awaited<ReturnType<typeof import('vscode').lm.selectChatModels>>[0];
+  let model: LanguageModelChat | null = null;
+  const families = ['gpt-4.1', 'gpt-5-mini', 'gpt-4.1-mini', 'codex', 'antigravity'];
+  for (const family of families) {
+    const models = await lm.selectChatModels({ family });
+    if (models.length > 0) {
+      model = models[0];
+      break;
+    }
+  }
+
+  if (!model) {
+    const vendors = ['copilot', 'codex', 'antigravity'];
+    for (const vendor of vendors) {
+      const models = await lm.selectChatModels({ vendor });
+      if (models.length > 0) {
+        model = models[0];
+        break;
+      }
+    }
+  }
+
+  if (!model) {
+    const any = await lm.selectChatModels({});
+    if (any.length > 0) {
+      model = any[0];
+    }
+  }
+
   if (!model) return null;
 
   const systemPrompt = buildSystemPrompt();

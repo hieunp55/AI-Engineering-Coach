@@ -608,16 +608,16 @@ export class InsightsAnalyzer extends AnalyzerBase {
 
   private getMigrationFeatureMatrix(): Array<{ feature: string; description: string; harnesses: string[] }> {
     return [
-      { feature: 'Sub-agents', description: 'Delegate sub-tasks to specialized agents', harnesses: ['Local Agent', 'Local Agent (Insiders)', 'Claude'] },
-      { feature: 'MCP Tools', description: 'Model Context Protocol tool integration', harnesses: ['Local Agent', 'Local Agent (Insiders)', 'Claude'] },
-      { feature: 'Custom Instructions', description: 'Project-level AI instructions (.instructions.md)', harnesses: ['Local Agent', 'Local Agent (Insiders)', 'Claude'] },
-      { feature: 'Plan Mode', description: 'Separate planning step before implementation', harnesses: ['Local Agent', 'Local Agent (Insiders)', 'Claude'] },
-      { feature: 'Skills', description: 'Domain-specific knowledge modules', harnesses: ['Local Agent', 'Local Agent (Insiders)'] },
-      { feature: 'Slash Commands', description: '/fix, /explain, /tests, /doc', harnesses: ['Local Agent', 'Local Agent (Insiders)'] },
-      { feature: 'Multi-file Edits', description: 'Edit multiple files in a single turn', harnesses: ['Local Agent', 'Local Agent (Insiders)', 'Claude', 'Codex'] },
-      { feature: 'Terminal Access', description: 'Run commands as part of agent workflow', harnesses: ['Local Agent', 'Local Agent (Insiders)', 'Claude', 'Codex', 'OpenCode'] },
-      { feature: 'File References', description: 'Reference specific files in prompts', harnesses: ['Local Agent', 'Local Agent (Insiders)', 'Claude'] },
-      { feature: 'Parallel Sessions', description: 'Run multiple conversations simultaneously', harnesses: ['Local Agent', 'Local Agent (Insiders)', 'Claude', 'Codex'] },
+      { feature: 'Sub-agents', description: 'Delegate sub-tasks to specialized agents', harnesses: ['Local Agent', 'Local Agent (Insiders)', 'Claude', 'Antigravity IDE', 'Antigravity IDE (Insiders)'] },
+      { feature: 'MCP Tools', description: 'Model Context Protocol tool integration', harnesses: ['Local Agent', 'Local Agent (Insiders)', 'Claude', 'Antigravity IDE', 'Antigravity IDE (Insiders)'] },
+      { feature: 'Custom Instructions', description: 'Project-level AI instructions (.instructions.md)', harnesses: ['Local Agent', 'Local Agent (Insiders)', 'Claude', 'Antigravity IDE', 'Antigravity IDE (Insiders)'] },
+      { feature: 'Plan Mode', description: 'Separate planning step before implementation', harnesses: ['Local Agent', 'Local Agent (Insiders)', 'Claude', 'Antigravity IDE', 'Antigravity IDE (Insiders)'] },
+      { feature: 'Skills', description: 'Domain-specific knowledge modules', harnesses: ['Local Agent', 'Local Agent (Insiders)', 'Antigravity IDE', 'Antigravity IDE (Insiders)'] },
+      { feature: 'Slash Commands', description: '/fix, /explain, /tests, /doc', harnesses: ['Local Agent', 'Local Agent (Insiders)', 'Antigravity IDE', 'Antigravity IDE (Insiders)'] },
+      { feature: 'Multi-file Edits', description: 'Edit multiple files in a single turn', harnesses: ['Local Agent', 'Local Agent (Insiders)', 'Claude', 'Codex', 'Antigravity IDE', 'Antigravity IDE (Insiders)'] },
+      { feature: 'Terminal Access', description: 'Run commands as part of agent workflow', harnesses: ['Local Agent', 'Local Agent (Insiders)', 'Claude', 'Codex', 'OpenCode', 'Antigravity IDE', 'Antigravity IDE (Insiders)'] },
+      { feature: 'File References', description: 'Reference specific files in prompts', harnesses: ['Local Agent', 'Local Agent (Insiders)', 'Claude', 'Antigravity IDE', 'Antigravity IDE (Insiders)'] },
+      { feature: 'Parallel Sessions', description: 'Run multiple conversations simultaneously', harnesses: ['Local Agent', 'Local Agent (Insiders)', 'Claude', 'Codex', 'Antigravity IDE', 'Antigravity IDE (Insiders)'] },
     ];
   }
 

@@ -323,7 +323,7 @@ export function findClaudeDirs(): string[] {
  *  component name, and colons are not handled here because Windows component
  *  names cannot contain them. */
 function encodeComponentForMatch(name: string): string {
-  return name.replace(/\s/g, '-');
+  return name.replaceAll(/\s/g, '-');
 }
 
 /**

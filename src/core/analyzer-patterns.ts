@@ -259,7 +259,7 @@ export class PatternsAnalyzer extends AnalyzerBase {
       return enriched;
     });
 
-    const skipIdeDetectors = !!(f?.harness && !f.harness.startsWith('Local Agent') && f.harness !== 'Xcode');
+    const skipIdeDetectors = !!(f?.harness && !f.harness.startsWith('Local Agent') && !f.harness.startsWith('Antigravity IDE') && f.harness !== 'Xcode');
     const patterns = runDetectors(enrichedReqs, sessions, skipIdeDetectors);
     return this.buildAntiPatternResult(patterns, reqs, skipIdeDetectors);
   }

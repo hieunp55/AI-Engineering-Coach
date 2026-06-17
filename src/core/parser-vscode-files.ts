@@ -147,8 +147,8 @@ function setAtPath(obj: JsonValue, keys: PathKey[], value: JsonValue): void {
       if (current[key] === null) current[key] = {};
       current = current[key]!;
     } else if (typeof current === 'object' && current !== null && !Array.isArray(current)) {
-      if (!Object.prototype.hasOwnProperty.call(current, key as string)) (current as JsonObject)[key as string] = {};
-      current = (current as JsonObject)[key as string];
+      if (!Object.prototype.hasOwnProperty.call(current, key as string)) (current)[key as string] = {};
+      current = (current)[key as string];
     }
   }
   const last = keys[keys.length - 1];
@@ -157,7 +157,7 @@ function setAtPath(obj: JsonValue, keys: PathKey[], value: JsonValue): void {
     while (current.length <= (last as number)) current.push(null);
     current[last as number] = value;
   } else if (typeof current === 'object' && current !== null) {
-    (current as JsonObject)[last as string] = value;
+    (current)[last as string] = value;
   }
 }
 
@@ -168,8 +168,8 @@ function appendAtPath(obj: JsonValue, keys: PathKey[], items: JsonValue): void {
     if (typeof key === 'number' && Array.isArray(target)) {
       target = target[key];
     } else if (typeof target === 'object' && target !== null && !Array.isArray(target)) {
-      if (!Object.prototype.hasOwnProperty.call(target, key as string)) (target as JsonObject)[key as string] = [];
-      target = (target as JsonObject)[key as string];
+      if (!Object.prototype.hasOwnProperty.call(target, key as string)) (target)[key as string] = [];
+      target = (target)[key as string];
     }
   }
   if (Array.isArray(target) && Array.isArray(items)) {
@@ -228,7 +228,7 @@ export function reconstructFromJsonl(fpath: string): Record<string, unknown> | n
   if (initialModeId) {
     const is = state.inputState;
     if (is && typeof is === 'object' && !Array.isArray(is)) {
-      is.mode = { id: initialModeId } as unknown as JsonValue;
+      is.mode = { id: initialModeId };
     }
   }
   return state;

@@ -392,8 +392,8 @@ async function loadDashSkills(currentFilter: DateFilter): Promise<void> {
 
       // Run custom triage and catalog discovery in parallel
       const [triageResult, catResult] = await Promise.all([
-        rpc<SkillTriageResult>('triageSkills', { clusters: topClusters } as Record<string, unknown>).catch(() => null),
-        rpc<CatalogDiscoverResult>('discoverCatalog', {} as Record<string, unknown>).catch(() => null),
+        rpc<SkillTriageResult>('triageSkills', { clusters: topClusters }).catch(() => null),
+        rpc<CatalogDiscoverResult>('discoverCatalog', {}).catch(() => null),
       ]);
 
       if (triageResult) {
@@ -410,7 +410,7 @@ async function loadDashSkills(currentFilter: DateFilter): Promise<void> {
               label: c.label, occurrences: c.occurrences,
               workspaces: c.workspaces, examples: c.examples.slice(0, 3),
             })),
-          } as Record<string, unknown>);
+          });
           catalogMatches = triaged.items || [];
         } catch { /* catalog triage failed */ }
       }

@@ -1,12 +1,12 @@
 <h1 align="center">AI Engineer Coach</h1>
 
 <p align="center">
-Analyze your AI coding assistant usage across VS Code, GitHub Copilot for Xcode, Claude, Codex, OpenCode, and GitHub Copilot CLI.
+Analyze your AI coding assistant usage across VS Code, Antigravity IDE, KIRO IDE, GitHub Copilot for Xcode, Claude, Codex, OpenCode, and GitHub Copilot CLI.
 </p>
 
 <p align="center">
 <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
-<img alt="VS Code 1.85+" src="https://img.shields.io/badge/VS%20Code-1.85%2B-007ACC">
+<img alt="VS Code 1.107+" src="https://img.shields.io/badge/VS%20Code-1.107%2B-007ACC">
 </p>
 
 ## Highlights
@@ -57,10 +57,14 @@ The extension is organized into three sections: **Observe**, **Measure**, and **
 | **Local Agent (Insiders)** | macOS: `~/Library/Application Support/Code - Insiders/User/workspaceStorage/`<br>Linux: `~/.config/Code - Insiders/User/workspaceStorage/`<br>Windows: `%APPDATA%\Code - Insiders\User\workspaceStorage\` |
 | **Local Agent (Server)** | Linux/macOS remote host: `~/.vscode-server/data/User/workspaceStorage/` |
 | **Local Agent (Server Insiders)** | Linux/macOS remote host: `~/.vscode-server-insiders/data/User/workspaceStorage/` |
+| **Antigravity IDE** | macOS: `~/Library/Application Support/antigravity-ide/User/workspaceStorage/` or `~/.gemini/antigravity-ide/User/workspaceStorage/`<br>Linux: `~/.config/antigravity-ide/User/workspaceStorage/` or `~/.gemini/antigravity-ide/User/workspaceStorage/`<br>Windows: `%APPDATA%\Antigravity IDE\User\workspaceStorage\` |
+| **Antigravity IDE (Insiders)** | macOS: `~/Library/Application Support/antigravity-ide-insiders/User/workspaceStorage/` or `~/.gemini/antigravity-ide-insiders/User/workspaceStorage/`<br>Linux: `~/.config/antigravity-ide-insiders/User/workspaceStorage/` or `~/.gemini/antigravity-ide-insiders/User/workspaceStorage/`<br>Windows: `%APPDATA%\Antigravity IDE - Insiders\User\workspaceStorage\` |
+| **Antigravity IDE transcripts** | `~/.gemini/antigravity-ide/brain/` and `~/.gemini/antigravity-ide-insiders/brain/` |
+| **KIRO IDE** | macOS: `~/Library/Application Support/Kiro/User/globalStorage/kiro.kiroagent/workspace-sessions/`<br>Linux: `~/.config/Kiro/User/globalStorage/kiro.kiroagent/workspace-sessions/`<br>Windows: `%APPDATA%\Kiro\User\globalStorage\kiro.kiroagent\workspace-sessions\` |
 | **Xcode Copilot Chat** | `~/.config/github-copilot/xcode/` (requires `sqlite3`) |
 | **Claude** | macOS/Linux: `~/.claude/projects/`<br>Windows: `%USERPROFILE%\.claude\projects\` |
-| **Codex** | macOS/Linux: `~/.codex/sessions/`<br>Windows: `%USERPROFILE%\.codex\sessions\` |
-| **OpenCode** | macOS/Linux: `~/.local/share/opencode/`<br>Windows: `%USERPROFILE%\.local\share\opencode\` |
+| **Codex** | macOS/Linux/Windows: `~/.codex/sessions/`, `~/.codex/archived_sessions/`, `~/.codex/archived-sessions/` |
+| **OpenCode** | macOS: `~/Library/Application Support/opencode/storage/`<br>Linux/Windows: `~/.local/share/opencode/storage/` |
 | **GitHub Copilot CLI** | `~/.copilot/session-state/` and `~/.copilot/history-session-state/` |
 
 ### Chat

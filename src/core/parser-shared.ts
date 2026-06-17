@@ -330,7 +330,7 @@ export function extractSkillPathsFromText(text: string): string[] {
 export function validateSession(session: unknown, source: string): Session | null {
   const result = SessionSchema.safeParse(session);
   if (result.success) {
-    return result.data as Session;
+    return result.data;
   }
   warnCore('schema', `Invalid session from ${source}: ${result.error.issues[0]?.message ?? 'unknown'}`);
   return null;

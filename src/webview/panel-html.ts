@@ -4,8 +4,8 @@
  *--------------------------------------------------------------------------------------------*/
 
 import * as vscode from 'vscode';
-import { getNonce } from './panel-shared';
 import { FF_TOKEN_REPORTING_ENABLED } from '../core/constants';
+import { getNonce } from './panel-shared';
 
 export function getDashboardHtml(webview: vscode.Webview, extensionUri: vscode.Uri): string {
   const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(extensionUri, 'dist', 'webview', 'app.js'));

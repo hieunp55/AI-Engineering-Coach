@@ -16,3 +16,6 @@ local/
 test_output.txt
 scripts/verify-counts.ts
 marketing/
+graphify_step2.ps1
+graphify-out/
+kiro_output.json

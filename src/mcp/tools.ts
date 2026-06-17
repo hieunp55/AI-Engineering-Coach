@@ -11,6 +11,7 @@
 import * as vscode from 'vscode';
 import type { Analyzer } from '../core/analyzer';
 import type { DateFilter } from '../core/types';
+import { FF_TOKEN_REPORTING_ENABLED } from '../core/constants';
 import {
   formatSummary,
   formatActivity,
@@ -25,7 +26,6 @@ import {
   formatSessions,
   formatContextHealth,
 } from './formatters';
-import { FF_TOKEN_REPORTING_ENABLED } from '../core/constants';
 
 /* ---- shared helpers ---- */
 
